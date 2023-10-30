@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Copyright (C) 2018 The Android Open Source Project
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:key="tv_extras"
+    android:title="@string/tv_extras" >
+
+    <SwitchPreference
+        android:key="device_dlg"
+        android:persistent="false"
+        android:title="@string/device_dlg"/>
+    <Preference
+        android:fragment="com.droidlogic.tv.extras.pqsettings.PictureModeFragment"
+        android:icon="@drawable/ic_settings_display"
+        android:key="picture_mode"
+        android:title="@string/pq_picture" />
+    <Preference
+        android:icon="@drawable/ic_settings_tv"
+        android:key="channel"
+        android:title="@string/tv_channel" />
+    <Preference
+        android:icon="@drawable/ic_settings_more"
+        android:key="tv_settings"
+        android:title="@string/system_setting"
+        android:fragment="com.droidlogic.tv.extras.tvoption.DroidSettingsModeFragment" />
+
+    <Preference
+        android:key="power_and_energy_settings"
+        android:title="@string/power_on_behavior"
+        android:icon="@drawable/ic_settings_power"/>
+	<Preference
+        android:icon="@drawable/ic_settings_more"
+        android:key="wake_on_lan"
+        android:title="@string/wake_on_lan_enable"
+        android:fragment="com.droidlogic.tv.extras.WolFragment"/>
+</PreferenceScreen>
