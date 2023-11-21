@@ -842,7 +842,7 @@ public class PQSettingsManager {
     public boolean isNtscSignal() {
         final int DEFAULT_VALUE = -1;
         final int NTSC = 2;
-        return DataProviderManager.getIntValue(mContext, "curent_video_std", DEFAULT_VALUE) == NTSC;
+        return DataProviderManager.getIntValue(mContext, "current_video_std", DEFAULT_VALUE) == NTSC;
     }
 
     public void setAspectRatio(int mode) {

@@ -128,7 +128,7 @@ public class NoSignalScreenStatusFragment extends SettingsPreferenceFragment imp
         }
         int isStaticFrameEnable = mTvOptionSettingManager.getStaticFrameStatus();
         boolean enable = (isStaticFrameEnable == 1);
-        if (mTvOptionSettingManager.isChannalSource()) {
+        if (mTvOptionSettingManager.isChannelSource()) {
             mStaticFramePreference.setVisible(true);
             mStaticFramePreference.setChecked(enable);
         } else {

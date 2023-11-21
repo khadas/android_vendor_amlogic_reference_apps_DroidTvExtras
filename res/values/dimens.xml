@@ -151,12 +151,12 @@
     <integer name="action_description_min_lines">2</integer>
     <integer name="action_title_min_lines">1</integer>
 
-    <item name="alpha_animiation_max_opacity" format="float" type="dimen">1.0</item>
-    <item name="alpha_animiation_min_opacity" format="float" type="dimen">0.0</item>
-    <item name="alpha_activity_in_bkg_end" format="float" type="dimen">@dimen/alpha_animiation_max_opacity</item>
-    <item name="alpha_activity_in_bkg_start" format="float" type="dimen">@dimen/alpha_animiation_min_opacity</item>
-    <item name="alpha_activity_out_bkg_end" format="float" type="dimen">@dimen/alpha_animiation_min_opacity</item>
-    <item name="alpha_activity_out_bkg_start" format="float" type="dimen">@dimen/alpha_animiation_max_opacity</item>
+    <item name="alpha_animation_max_opacity" format="float" type="dimen">1.0</item>
+    <item name="alpha_animation_min_opacity" format="float" type="dimen">0.0</item>
+    <item name="alpha_activity_in_bkg_end" format="float" type="dimen">@dimen/alpha_animation_max_opacity</item>
+    <item name="alpha_activity_in_bkg_start" format="float" type="dimen">@dimen/alpha_animation_min_opacity</item>
+    <item name="alpha_activity_out_bkg_end" format="float" type="dimen">@dimen/alpha_animation_min_opacity</item>
+    <item name="alpha_activity_out_bkg_start" format="float" type="dimen">@dimen/alpha_animation_max_opacity</item>
 
     <integer name="base_animation_duration">500</integer>
     <integer name="alpha_activity_in_bkg_delay">0</integer>

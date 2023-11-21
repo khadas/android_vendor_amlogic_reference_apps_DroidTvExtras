@@ -71,9 +71,13 @@
         android:key="tv_nosignal_screen_status"
         android:title="@string/tv_nosignal_screen_status" />
     <Preference
-        android:fragment="com.droidlogic.tv.extras.tvoption.HdmiCecFragment"
         android:key="hdmicec"
-        android:title="@string/system_cec" />
+        android:title="@string/system_cec"
+        android:persistent="false">
+        <intent
+            android:targetPackage="com.droidlogic.tv.settings"
+            android:targetClass="com.droidlogic.tv.settings.tvoption.HdmiCecActivity" />
+    </Preference>
     <ListPreference
         android:key="tv_daylight_saving_time"
         android:persistent="false"

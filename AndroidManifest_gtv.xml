@@ -175,6 +175,13 @@
             android:excludeFromRecents="true"
             android:theme="@style/TvSettingsActivityTheme"
             android:exported="false" />
+        <activity
+            android:name=".tvoption.DroidSettingsModeActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation"
+            android:excludeFromRecents="true"
+            android:theme="@style/Theme.Settings.Transparent"
+            android:label="@string/launcher_settings_app_name"
+            android:exported="true" />
         <service android:exported="true"
                  android:name=".suspend.TimerSuspendService" >
             <intent-filter>

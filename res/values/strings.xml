@@ -1922,7 +1922,7 @@
 
     <!-- Slice uri for "Accounts & Sign in" -->
     <string name="account_slice_uri" translatable="false"/>
-    <!-- Slice uri and title for manange user services settings -->
+    <!-- Slice uri and title for manage user services settings -->
     <string name="manage_user_services_slice_uri" translatable="false" />
     <string name="manage_user_services_slice_title" translatable="false" />
 

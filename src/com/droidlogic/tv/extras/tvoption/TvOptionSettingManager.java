@@ -462,7 +462,7 @@ public class TvOptionSettingManager {
         }
     }
 
-    public boolean isChannalSource() {
+    public boolean isChannelSource() {
         if ((mDeviceId == DroidLogicTvUtils.DEVICE_ID_ATV)
                 || (mDeviceId == DroidLogicTvUtils.DEVICE_ID_DTV)
                 || (mDeviceId == DroidLogicTvUtils.DEVICE_ID_ADTV)

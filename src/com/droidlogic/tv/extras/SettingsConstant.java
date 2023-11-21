@@ -80,7 +80,7 @@ public class SettingsConstant {
     public static boolean needDroidlogicDigitalSounds(Context context){
         return context.getResources().getBoolean(R.bool.display_need_digital_sounds);
     }
-    public static boolean needScreenResolutionFeture(Context context){
+    public static boolean needScreenResolutionFeature(Context context){
         return context.getResources().getBoolean(R.bool.display_need_screen_resolution);
     }
     public static boolean needDroidlogicHdmicecFeature(Context context){

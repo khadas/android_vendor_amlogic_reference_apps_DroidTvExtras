@@ -21,15 +21,15 @@
             android:key="tv_static_frame"
             android:persistent="false"
             android:title="@string/tv_static_frame"
-            android:summary="Show a static frame of last channal when switch channals" />
+            android:summary="Show a static frame of last channel when switch channels" />
         <SwitchPreference
             android:key="tv_black_screen"
             android:persistent="false"
             android:title="@string/tv_black_screen"
-            android:summary="Show black screen when switch channal or input source" />
+            android:summary="Show black screen when switch channel or input source" />
         <SwitchPreference
             android:key="tv_blue_screen"
             android:persistent="false"
             android:title="@string/tv_blue_screen"
-            android:summary="Show blue screen when switch channal or input source"/>
+            android:summary="Show blue screen when switch channel or input source"/>
 </PreferenceScreen>
