@@ -179,8 +179,9 @@ public class PQSettingsManager {
     public static final int PIC_GAME = 7;
     public static final int PIC_SPORT = 8;
 
-    public static final int PIC_DV_BRIGHT = 12;
-    public static final int PIC_DV_DARK = 13;
+    public static final int PIC_DV_DARK = 12;
+    public static final int PIC_DV_BRIGHT = 13;
+
 
     public static final int VRR_BASIC = 1;
     public static final int FreeSync = 2;
