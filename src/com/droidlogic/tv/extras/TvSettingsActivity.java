@@ -19,12 +19,18 @@ package com.droidlogic.tv.extras;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Bundle;
 import android.transition.Scene;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -34,6 +40,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.droidlogic.tv.extras.overlay.FlavorUtils;
+import com.droidlogic.tv.extras.tvoption.TvOptionSettingManager;
+import com.droidlogic.app.DataProviderManager;
 
 import com.android.settingslib.core.instrumentation.MetricsFeatureProvider;
 import com.android.settingslib.core.instrumentation.SharedPreferencesLogger;
@@ -45,6 +53,11 @@ public abstract class TvSettingsActivity extends FragmentActivity {
             "com.droidlogic.tv.extras.MainActivity.SETTINGS_FRAGMENT";
 
     private static final int REQUEST_CODE_STARTUP_VERIFICATION = 1;
+
+    public static final String INTENT_ACTION_FINISH_FRAGMENT = "action.finish.droidsettingsmodefragment";
+    public static final int MODE_LAUNCHER = 0;
+    public static final int MODE_LIVE_TV = 1;
+    private int mStartMode = MODE_LAUNCHER;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -102,6 +115,62 @@ public abstract class TvSettingsActivity extends FragmentActivity {
                     });
         }
 
+        mStartMode = getIntent().getIntExtra("from_live_tv", MODE_LAUNCHER);
+        Log.d(TAG, "mStartMode : " + mStartMode);
+        if (SettingsConstant.needDroidlogicCustomization(this)) {
+            if (mStartMode == MODE_LIVE_TV) {
+                startShowActivityTimer();
+            }
+        }
+
+    }
+
+    public BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "intent = " + intent);
+            switch (intent.getAction()) {
+                case INTENT_ACTION_FINISH_FRAGMENT:
+                case Intent.ACTION_CLOSE_SYSTEM_DIALOGS:
+                    finish();
+                    break;
+            }
+        }
+    };
+    public void registerSomeReceivers() {
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(INTENT_ACTION_FINISH_FRAGMENT);
+        intentFilter.addAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+        registerReceiver(mReceiver, intentFilter, Context.RECEIVER_NOT_EXPORTED);
+    }
+
+    public void unregisterSomeReceivers() {
+        unregisterReceiver(mReceiver);
+    }
+
+    @Override
+    public void onResume() {
+        registerSomeReceivers();
+        if (SettingsConstant.needDroidlogicCustomization(this)) {
+            if (mStartMode == MODE_LIVE_TV) {
+                startShowActivityTimer();
+            }
+        }
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        handler.removeMessages(0);
+        Log.d(TAG, "onPause");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        unregisterSomeReceivers();
+        Log.d(TAG, "onDestroy");
     }
 
     public void finish() {
@@ -214,4 +283,60 @@ public abstract class TvSettingsActivity extends FragmentActivity {
         }
         return super.getSharedPreferences(name, mode);
     }
+
+    @Override
+    public boolean dispatchKeyEvent (KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            switch (event.getKeyCode()) {
+                case KeyEvent.KEYCODE_DPAD_UP:
+                case KeyEvent.KEYCODE_DPAD_DOWN:
+                case KeyEvent.KEYCODE_DPAD_LEFT:
+                case KeyEvent.KEYCODE_DPAD_RIGHT:
+                case KeyEvent.KEYCODE_DPAD_CENTER:
+                case KeyEvent.KEYCODE_BACK:
+                    if (mStartMode == MODE_LIVE_TV) {
+                        Log.d(TAG, "dispatchKeyEvent");
+                        startShowActivityTimer();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return super.dispatchKeyEvent(event);
+    }
+
+    public void startShowActivityTimer() {
+        handler.removeMessages(0);
+
+        int seconds = DataProviderManager.getIntValue(this, TvOptionSettingManager.KEY_MENU_TIME,
+                TvOptionSettingManager.DEFAULT_MENU_TIME);
+        if (seconds == 1) {
+            seconds = 15;
+        } else if (seconds == 2) {
+            seconds = 30;
+        } else if (seconds == 3) {
+            seconds = 60;
+        } else if (seconds == 4) {
+            seconds = 120;
+        } else if (seconds == 5) {
+            seconds = 240;
+        } else {
+            seconds = 0;
+        }
+        if (seconds > 0) {
+            handler.sendEmptyMessageDelayed(0, seconds * 1000);
+        } else {
+            handler.removeMessages(0);
+        }
+    }
+
+    Handler handler = new Handler() {
+        public void handleMessage(Message msg) {
+            Intent intent = new Intent();
+            intent.setAction(INTENT_ACTION_FINISH_FRAGMENT);
+            sendBroadcast(intent);
+        }
+    };
 }

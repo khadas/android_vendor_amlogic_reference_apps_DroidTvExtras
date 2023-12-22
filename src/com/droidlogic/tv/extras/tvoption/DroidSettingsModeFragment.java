@@ -64,6 +64,7 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment implem
     private static final String CLOSED_CAPTIONS = "tv_closed_captions";
     private static final String AV_PARENTAL_CONTROLS = "parental_controls";
     private static final String MENU_TIME = "tv_menu_time";
+    private static final String KEY_MENU_TIME = "menu_time";
     private static final String SLEEP_TIMER = "sleep_timer";
     private static final String NOSIGNAL_SLEEP_TIMER = "tv_nosignal_timeout";
     private static final String NOSIGNAL_SCREEN_STATUS = "tv_nosignal_screen_status";
@@ -201,6 +202,8 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment implem
             startUiInLiveTv(CLOSED_CAPTIONS);
         } else if (TextUtils.equals(preference.getKey(), PIP)) {
             startUiInLiveTv(PIP);
+        } else if (TextUtils.equals(preference.getKey(), KEY_HDMI_CEC_CONTROL)) {
+            startHdmiCec();
         }
         return super.onPreferenceTreeClick(preference);
     }
@@ -211,17 +214,24 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment implem
     }
 
     private void startUiInLiveTv(String value) {
+        finishTvSettingsUi();
         Intent intent = new Intent();
         intent.setAction("action.startlivetv.settingui");
         intent.putExtra(value, true);
         getActivity().sendBroadcast(intent);
-        getActivity().finish();
     }
 
-    private void startFactoryMenu() {
-        Intent factory = new Intent("droidlogic.intent.action.FactoryMainActivity");
-        getActivity().startActivity(factory);
-        getActivity().finish();
+    private void startHdmiCec() {
+        Intent intent = new Intent();
+        intent.setClassName("com.droidlogic.tv.settings", "com.droidlogic.tv.settings.tvoption.HdmiCecActivity");
+        intent.putExtra("from_live_tv", getActivity().getIntent().getIntExtra("from_live_tv", 0));
+        getActivity().startActivity(intent);
+    }
+
+    private void finishTvSettingsUi() {
+        Intent intent = new Intent();
+        intent.setAction(INTENT_ACTION_FINISH_FRAGMENT);
+        getActivity().sendBroadcast(intent);
     }
 
     @Override
@@ -234,6 +244,7 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment implem
             mTvOptionSettingManager.setAutoBacklightStatus(selection);
         } else if (TextUtils.equals(preference.getKey(), MENU_TIME)) {
             mTvOptionSettingManager.setMenuTime(selection);
+            Settings.Global.putInt(getActivity().getContentResolver(), KEY_MENU_TIME, selection);
         } else if (TextUtils.equals(preference.getKey(), SLEEP_TIMER)) {
             mTvOptionSettingManager.setSleepTimer(selection);
         } else if (TextUtils.equals(preference.getKey(), NOSIGNAL_SLEEP_TIMER)) {
@@ -241,10 +252,6 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment implem
         } else if (TextUtils.equals(preference.getKey(), DAYLIGHT_SAVING_TIME)) {
             mTvOptionSettingManager.setDaylightSavingTime(selection);
         }
-
-        Intent intent = new Intent();
-        intent.setAction(INTENT_ACTION_FINISH_FRAGMENT);
-        getActivity().sendBroadcast(intent);
         return true;
     }
 

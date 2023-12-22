@@ -73,11 +73,7 @@
     <Preference
         android:key="hdmicec"
         android:title="@string/system_cec"
-        android:persistent="false">
-        <intent
-            android:targetPackage="com.droidlogic.tv.settings"
-            android:targetClass="com.droidlogic.tv.settings.tvoption.HdmiCecActivity" />
-    </Preference>
+        android:persistent="false"/>
     <ListPreference
         android:key="tv_daylight_saving_time"
         android:persistent="false"
