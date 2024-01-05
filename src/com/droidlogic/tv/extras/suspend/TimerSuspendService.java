@@ -12,9 +12,13 @@ package com.droidlogic.tv.extras.suspend;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.*;
+import android.content.pm.ServiceInfo;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -48,6 +52,9 @@ public class TimerSuspendService extends Service {
     public static final int INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH = 2;
     private static final int TIMEOUT_10MIN = 10 * 60;//10min
     private static final int TIMEOUT_1MIN = 1 * 60;//1min
+    private static TimerSuspendService sInstance;
+    private static final String SUSPEND_NOTIFICATION_CHANNEL_ID = "suspend_notification_channel";
+    private static final String SUSPEND_PROMPT = "Standby countdown";
 
     protected final BroadcastReceiver mScreenBroadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -67,12 +74,14 @@ public class TimerSuspendService extends Service {
 
     @Override
     public void onCreate() {
+        logDebug(TAG, false, "onCreate");
         super.onCreate();
         this.mContext = this;
         initTimeSuspend();
         IntentFilter boot = new IntentFilter();
         boot.addAction(Intent.ACTION_SCREEN_OFF);
         registerReceiver(mScreenBroadcastReceiver, boot);
+        createNotificationChannel();
     }
 
     @Override
@@ -81,31 +90,17 @@ public class TimerSuspendService extends Service {
     }
 
     @Override
-    public int onStartCommand ( Intent intent, int flags, int startId ) {
+    public int onStartCommand (Intent intent, int flags, int startId) {
+        logDebug(TAG, true, "onStartCommand");
         if (intent != null)  {
             logDebug(TAG, false, "intent=" + intent);
             mEnableSuspendTimeout = intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, false);
             mEnableNoSignalTimeout = intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_NOSIGNAL_TIMEOUT, false);
-            //stop it if need cancel
-            if (!mEnableSuspendTimeout) {
-                if (!mEnableNoSignalTimeout) {
-                    //DataProviderManager.putIntValue(mContext, DroidLogicTvUtils.PROP_DROID_TV_SLEEP_TIME, 0);
-                    //stopSelf();
-                } else {
-                    reset_shutdown_time(TIMEOUT_10MIN);//10min
-                }
+            int mode = intent.getIntExtra("mode", -1);
+            if (mode >= 0) {
+                setSleepTimer(mode);
             } else {
-                if (DataProviderManager.getBooleanValue(mContext, "is_channel_searching", false)) {
-                    logDebug(TAG, false, "Station search in progress, stop standby");
-                    stopSelf();
-                } else {
-                    int mode = intent.getIntExtra("mode", -1);
-                    if (mode >= 0) {
-                        setSleepTimer(mode);
-                    } else {
-                        reset_shutdown_time(TIMEOUT_1MIN);//one min
-                    }
-                }
+                startForeground();
             }
         }
 
@@ -265,5 +260,57 @@ public class TimerSuspendService extends Service {
         boolean isScreenOpen = powerManager.isScreenOn();
         logDebug(TAG, false, "isSystemScreenOn isScreenOpen = " + isScreenOpen);
         return isScreenOpen;
+    }
+
+    static void startForegroundService(Context context,Intent intent) {
+        if (sInstance == null) {
+            Intent intentService = new Intent(context, TimerSuspendService.class);
+            intentService.putExtra(DroidLogicTvUtils.KEY_ENABLE_NOSIGNAL_TIMEOUT, intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_NOSIGNAL_TIMEOUT, false));
+            intentService.putExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, false));
+            context.startForegroundService(intentService);
+        } else {
+            sInstance.mEnableNoSignalTimeout = intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_NOSIGNAL_TIMEOUT, false);
+            sInstance.mEnableSuspendTimeout = intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, false);
+            sInstance.startForeground();
+        }
+    }
+
+    private void startForeground() {
+        logDebug(TAG, true, "startForeground");
+        Intent notificationIntent = new Intent(this, TimerSuspendService.class);
+        Notification.Builder builder  = new Notification.Builder(this)
+                .setContentTitle(SUSPEND_PROMPT)
+                .setContentText(SUSPEND_PROMPT)
+                .setSmallIcon(R.drawable.ic_settings_more);
+        Notification notification = builder.setChannelId(SUSPEND_NOTIFICATION_CHANNEL_ID).build();
+
+        startForeground(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED);
+
+        //stop it if need cancel
+        if (!mEnableSuspendTimeout) {
+            if (!mEnableNoSignalTimeout) {
+                //DataProviderManager.putIntValue(mContext, DroidLogicTvUtils.PROP_DROID_TV_SLEEP_TIME, 0);
+                //stopSelf();
+            } else {
+                reset_shutdown_time(TIMEOUT_10MIN);//10min
+            }
+        } else {
+            if (DataProviderManager.getBooleanValue(mContext, "is_channel_searching", false)) {
+                logDebug(TAG, true, "Station search in progress, stop standby");
+                stopSelf();
+            } else {
+                reset_shutdown_time(TIMEOUT_1MIN);//one min
+            }
+        }
+    }
+
+    private void createNotificationChannel() {
+        NotificationChannel channel = new NotificationChannel(
+                SUSPEND_NOTIFICATION_CHANNEL_ID,
+                SUSPEND_PROMPT,
+                NotificationManager.IMPORTANCE_DEFAULT
+        );
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        manager.createNotificationChannel(channel);
     }
 }
