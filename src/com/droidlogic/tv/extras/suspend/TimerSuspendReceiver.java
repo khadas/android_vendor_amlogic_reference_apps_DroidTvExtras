@@ -37,10 +37,8 @@ public class TimerSuspendReceiver extends BroadcastReceiver {
         if (intent != null) {
             if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
                 // once new boot, clear sleep time
-                logDebug(TAG, false, "Clear SleepTime");
+                logDebug(TAG, true, "Clear SleepTime");
                 DataProviderManager.putIntValue(mContext, DroidLogicTvUtils.PROP_DROID_TV_SLEEP_TIME, 0);
-                Intent intentService = new Intent(mContext, TimerSuspendService.class );
-                mContext.startService(intentService);
                 return;
             }
             //add for third party application that can't raise power key
@@ -57,10 +55,12 @@ public class TimerSuspendReceiver extends BroadcastReceiver {
     }
 
     public void startSleepTimer (Intent intent) {
-        Intent intentService = new Intent(mContext, TimerSuspendService.class );
-        intentService.putExtra(DroidLogicTvUtils.KEY_ENABLE_NOSIGNAL_TIMEOUT, intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_NOSIGNAL_TIMEOUT, false));
-        intentService.putExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, false));
-        mContext.startService (intentService);
+        logDebug(TAG, true, "startSleepTimer");
+        TimerSuspendService.startForegroundService(mContext, intent);
+//        Intent intentService = new Intent(mContext, TimerSuspendService.class );
+//        intentService.putExtra(DroidLogicTvUtils.KEY_ENABLE_NOSIGNAL_TIMEOUT, intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_NOSIGNAL_TIMEOUT, false));
+//        intentService.putExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, false));
+//        mContext.startService (intentService);
     }
 
     private void pressPowerKey () {

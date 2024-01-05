@@ -354,8 +354,8 @@ public class TvOptionSettingManager {
 
     public void setSleepTimer(int mode) {
         DataProviderManager.putIntValue(mContext, DroidLogicTvUtils.PROP_DROID_TV_SLEEP_TIME, mode);
-        String sleepTimerService = "com.droidlogic.droidlivetv.TimerSuspendService";
-        String targetPackage = "com.droidlogic.droidlivetvsettings";
+        String sleepTimerService = "com.droidlogic.tv.extras.suspend.TimerSuspendService";
+        String targetPackage = "com.droidlogic.tv.extras";
         Intent intent = new Intent();
         intent.putExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, true);
         intent.putExtra("mode", mode);
