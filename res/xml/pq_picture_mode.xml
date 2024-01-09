@@ -87,17 +87,10 @@
         android:entryValues="@array/pq_aspect_ratio_entry_values"
         android:title="@string/pq_aspect_ratio"
         android:summary="%s" />
-    <ListPreference
-        android:key="pq_ai_pq"
-        android:persistent="false"
-        android:entries="@array/pq_ai_pq_entries"
-        android:entryValues="@array/pq_ai_pq_entry_values"
-        android:title="@string/pq_ai_pq"
-        android:summary="%s" />
-    <SwitchPreference
-        android:key="pq_ai_sr_enable"
-        android:persistent="true"
-        android:title="@string/ai_sr_enable"/>
+    <Preference
+        android:key="ai_pq"
+        android:title="@string/pq_ai_pq_sr"
+        android:fragment="com.droidlogic.tv.extras.pqsettings.AiPqFragment"/>
     <Preference
         android:fragment="com.droidlogic.tv.extras.pqsettings.AdjustBaclLightFragment"
         android:key="pq_backlight"

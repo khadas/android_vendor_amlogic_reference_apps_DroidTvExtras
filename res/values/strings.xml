@@ -2850,13 +2850,15 @@
     <string name="droidsetting_debug" translatable="false">Amlogic_Debug_Options</string>
 
     <!-- aipq -->
-    <string name="ai_pq" translatable="false">AI PQ</string>
-    <string name="ai_pq_enable" translatable="false">Enable AI PQ</string>
-    <string name="ai_pq_info_enable" translatable="false">Show AI PQ information</string>
+    <string name="ai_pq">AI PQ</string>
+    <string name="pq_ai_pq_sr">AI-PQ/AI-SR</string>
+    <string name="ai_pq_enable">Enable AI PQ</string>
+    <string name="ai_pq_info_enable">Show AI PQ information</string>
     <string name="prepare">AI PQ invalid value...</string>
-    <string name="frame_rate" translatable="false">FrameRate</string>
-    <string name="frame_rate_enable" translatable="false">Enable FrameRate</string>
+    <string name="frame_rate">FrameRate</string>
+    <string name="frame_rate_enable">Enable FrameRate</string>
     <string name="frame_rate_prepare">invalid value...</string>
+    <string name="ai_color_enable" translatable="false">Ai Color</string>
 
     <!-- Processing Dialog -->
     <string name="resolution_selection_dialog_desc">Select OK to use %1$s from now on.</string>
@@ -2866,8 +2868,8 @@
     <string name="start_activity">Start Activity</string>
 
 	<!-- wol -->
-	<string name="wake_on_lan" translatable="false">Wake On Lan</string>
-	<string name="wake_on_lan_enable" translatable="false">Wake On Lan</string>
+	<string name="wake_on_lan">Wake On Lan</string>
+	<string name="wake_on_lan_enable">Wake On Lan</string>
 	<string name="wake_on_lan_description">Allow TV waked by ethernel</string>
     <!-- DroidLogic end -->
 

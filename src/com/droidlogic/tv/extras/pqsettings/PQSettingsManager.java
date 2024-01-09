@@ -387,16 +387,6 @@ public class PQSettingsManager {
             return Aspect_Ratio_Mode.ASPEC_RATIO_AUTO.toInt();
     }
 
-    public int getAIPQStatus () {
-        if (CanDebug()) Log.d(TAG, "getAspectRatioStatus");
-        boolean AIPQStatus = mSystemControlManager.getAipqEnable();
-        return AIPQStatus ? 0: 1;//0 is on ,1 is off
-    }
-
-    public boolean getAisr() {
-        return mSystemControlManager.GetAisr();
-    }
-
     public int GetSourceHdrType() {
         int sourceHdrType = mSystemControlManager.GetSourceHdrType();
         if (CanDebug()) {
@@ -862,19 +852,38 @@ public class PQSettingsManager {
         }
     }
 
-    public void setAIPQ(int mode) {
-        if (CanDebug()) Log.d(TAG, "setAIPQ:" + mode);
-        mSystemControlManager.setAipqEnable(mode == 0 ? true : false);
+    public boolean hasAipqFunc() {
+        boolean isAipqFun = mSystemControlManager.hasAipqFunc();
+        Log.d(TAG, "hasAipqFunc: " + isAipqFun);
+        return isAipqFun;
+    }
+
+    public boolean getAipqEnabled() {
+        Log.d(TAG, "getAipqEnabled:" + mSystemControlManager.getAipqEnable());
+        return mSystemControlManager.getAipqEnable();
+    }
+
+    public void setAipqEnabled(boolean enable) {
+        mSystemControlManager.setAipqEnable(enable);
+    }
+
+    public boolean getAipqInfo(String aipqInfoEnable) {
+        return mSystemControlManager.getPropertyBoolean(aipqInfoEnable, false);
+    }
+    public boolean getAisrEnabled() {
+        return mSystemControlManager.GetAisr();
+    }
+
+    public void setAisrEnabled(boolean enable) {
+        //mSystemControlManager.setAiSrEnable(enable);
+        mSystemControlManager.aisrContrl(enable);
     }
 
     public boolean hasAisrFunc() {
-        if (CanDebug()) Log.d(TAG, "hasAisrFunc");
+        if (CanDebug()) {
+            Log.d(TAG, "hasAisrFunc");
+        }
         return mSystemControlManager.hasAisrFunc();
-    }
-
-    public boolean setAisr(boolean on) {
-        if (CanDebug()) Log.d(TAG, "setAisr:" + on);
-        return mSystemControlManager.aisrContrl(on);
     }
 
     public void setAdvancedDynamicToneMappingStatus (int value) {
@@ -1463,6 +1472,20 @@ public class PQSettingsManager {
         }
         Log.d(TAG, "getHdmiColorRangeStatus : " + value);
         return value;
+    }
+
+    public int getAiColor() {
+        if (CanDebug()) {
+            Log.d(TAG, "getAiColor");
+        }
+        return mSystemControlManager.GetAiColor();
+    }
+
+    public int setAiColor(int value, int isSave) {
+        if (CanDebug()) {
+            Log.d(TAG, "setAiColor value: " + value + ", isSave: " + isSave);
+        }
+        return mSystemControlManager.SetAiColor(value, isSave);
     }
 
     public boolean isHdmiSource() {

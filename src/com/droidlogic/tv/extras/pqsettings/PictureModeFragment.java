@@ -39,17 +39,13 @@ import android.widget.TextView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-
 import com.droidlogic.tv.extras.SettingsConstant;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.MainFragment;
 import com.droidlogic.tv.extras.R;
 import com.droidlogic.tv.extras.SettingsConstant;
 
-import com.droidlogic.app.OutputModeManager;
-import com.droidlogic.app.tv.DroidLogicTvUtils;
-import com.droidlogic.app.tv.TvControlManager;
-import com.droidlogic.app.SystemControlManager;
+import static com.droidlogic.tv.extras.util.DroidUtils.CanDebug;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,8 +71,7 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
     private boolean FLAG_PQ_PICTURE_MODE_CVUA = false;
 
     private static final String PQ_CUSTOM = "pq_custom";
-    private static final String PQ_AI_PQ = "pq_ai_pq";
-    private static final String PQ_AI_SR = "pq_ai_sr_enable";
+    private static final String PQ_AI_PQ = "ai_pq";
     private static final String PQ_ASPECT_RATIO = "pq_aspect_ratio";
     private static final String PQ_BACKLIGHT = "pq_backlight";
     private static final String PQ_ADVANCED = "pq_advanced";
@@ -86,7 +81,6 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
     private static final String TV_CURRENT_DEVICE_ID = "tv_current_device_id";
     private static final String DTVKIT_PACKAGE = "org.dtvkit.inputsource";
 
-    private SwitchPreference mAisrSwitch;
     private ListPreference mPicturemodesdrPref;
     private ListPreference mPicturemodehdr10Pref;
     private ListPreference mPicturemodePref;
@@ -96,14 +90,9 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
     private ListPreference mPicturemodecvuaPref;
 
     private PQSettingsManager mPQSettingsManager;
-    private SystemControlManager mSystemControlManager;
 
     public static PictureModeFragment newInstance() {
         return new PictureModeFragment();
-    }
-
-    private boolean CanDebug() {
-        return PQSettingsManager.CanDebug();
     }
 
     @Override
@@ -123,9 +112,6 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
         mPicturemodePref = (ListPreference) findPreference(PQ_PICTURE_MODE);
         if (mPQSettingsManager == null) {
             mPQSettingsManager = new PQSettingsManager(getActivity());
-        }
-        if (mSystemControlManager == null) {
-            mSystemControlManager = SystemControlManager.getInstance();
         }
         getCurrentSource();
 
@@ -187,13 +173,6 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
             aspectratioPref.setVisible(false);
         }
 
-        mAisrSwitch = findPreference(PQ_AI_SR);
-        if (mPQSettingsManager.hasAisrFunc()) {
-            mAisrSwitch.setChecked(mPQSettingsManager.getAisr());
-        } else {
-            mAisrSwitch.setVisible(false);
-        }
-
     }
 
     @Override
@@ -214,9 +193,7 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
         if (mPQSettingsManager == null) {
             mPQSettingsManager = new PQSettingsManager(getActivity());
         }
-        if (mSystemControlManager == null) {
-            mSystemControlManager = SystemControlManager.getInstance();
-        }
+
         getCurrentSource();
         int is_from_live_tv = getActivity().getIntent().getIntExtra("from_live_tv", 0);
         boolean isTv = SettingsConstant.needDroidlogicTvFeature(getActivity());
@@ -255,24 +232,9 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
             aspectratioPref.setVisible(false);
         }
 
-        final ListPreference aipqPref = (ListPreference) findPreference(PQ_AI_PQ);
-        // First judge like this, and add specific judgment criteria later
-        if (mSystemControlManager.hasAipqFunc()) {
-            aipqPref.setValueIndex(mPQSettingsManager.getAIPQStatus());
-            //aipqPref.setValueIndex(1);
-            aipqPref.setOnPreferenceChangeListener(this);
-        } else {
+        final Preference aipqPref = (Preference) findPreference(PQ_AI_PQ);
+        if (!mPQSettingsManager.hasAipqFunc() && !mPQSettingsManager.hasAisrFunc()) {
             aipqPref.setVisible(false);
-        }
-
-        mAisrSwitch = findPreference(PQ_AI_SR);
-        // First judge like this, and add specific judgment criteria later
-        if (mPQSettingsManager.hasAisrFunc()) {
-            mAisrSwitch.setEnabled(true);
-            mAisrSwitch.setChecked(mPQSettingsManager.getAisr());
-            mAisrSwitch.setOnPreferenceChangeListener(this);
-        } else {
-            mAisrSwitch.setVisible(false);
         }
 
         final Preference backlightPref = (Preference) findPreference(PQ_BACKLIGHT);
@@ -294,7 +256,9 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        if (CanDebug()) Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
+        if (CanDebug()) {
+            Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
+        }
         switch (preference.getKey()) {
             case PQ_PICTURE_MODE_SDR:
                 if (mPQSettingsManager.STATUS_GAME.equals( mPQSettingsManager.getPictureModeStatus())
@@ -317,6 +281,9 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
                         "com.droidlogic.tv.extras.pqsettings.PQResetAllActivity");
                 startActivity(PQAllResetIntent);
                 break;
+            default:
+                break;
+
         }
         return super.onPreferenceTreeClick(preference);
     }
@@ -350,11 +317,6 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
         } else if (TextUtils.equals(preference.getKey(), PQ_ASPECT_RATIO)) {
             final int selection = Integer.parseInt((String)newValue);
             mPQSettingsManager.setAspectRatio(selection);
-        } else if (TextUtils.equals(preference.getKey(), PQ_AI_PQ)) {
-            final int selection = Integer.parseInt((String)newValue);
-            mPQSettingsManager.setAIPQ(selection);
-        } else if (TextUtils.equals(preference.getKey(), PQ_AI_SR)) {
-            mPQSettingsManager.setAisr((boolean) newValue);
         }
         return true;
     }
