@@ -19,7 +19,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,9 +28,9 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.droidlogic.app.DataProviderManager;
 import com.droidlogic.app.DroidLogicKeyEvent;
-import com.droidlogic.app.SystemControlManager;
 import com.droidlogic.app.tv.DroidLogicTvUtils;
 import com.droidlogic.tv.extras.R;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 import java.lang.reflect.Method;
 
@@ -45,7 +44,6 @@ public class TimerSuspendService extends Service {
     private boolean mEnableNoSignalTimeout = false;
     private boolean mEnableSuspendTimeout = false;
 
-    private SystemControlManager mSystemControlManager;
     private Context mContext = null;
     public static final int INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH = 2;
     private static final int TIMEOUT_10MIN = 10 * 60;//10min
@@ -57,7 +55,7 @@ public class TimerSuspendService extends Service {
             if (intent != null) {
                 String action = intent.getAction();
                 if (Intent.ACTION_SCREEN_OFF.equals(action)) {
-                    Log.i(TAG, "clear sleepTime because poweroff, screen_off");
+                    logDebug(TAG, false, "clear sleepTime because poweroff, screen_off");
                     cancelSleepTimer();
                     DataProviderManager.putIntValue(mContext, DroidLogicTvUtils.PROP_DROID_TV_SLEEP_TIME, 0);
                     hideDialog();
@@ -70,13 +68,11 @@ public class TimerSuspendService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        mSystemControlManager = SystemControlManager.getInstance();
         this.mContext = this;
         initTimeSuspend();
         IntentFilter boot = new IntentFilter();
         boot.addAction(Intent.ACTION_SCREEN_OFF);
         registerReceiver(mScreenBroadcastReceiver, boot);
-        Log.d(TAG, "onCreate");
     }
 
     @Override
@@ -86,9 +82,8 @@ public class TimerSuspendService extends Service {
 
     @Override
     public int onStartCommand ( Intent intent, int flags, int startId ) {
-        Log.d ( TAG, "onStartCommand");
         if (intent != null)  {
-            Log.d(TAG, "intent=" + intent);
+            logDebug(TAG, false, "intent=" + intent);
             mEnableSuspendTimeout = intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, false);
             mEnableNoSignalTimeout = intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_NOSIGNAL_TIMEOUT, false);
             //stop it if need cancel
@@ -101,7 +96,7 @@ public class TimerSuspendService extends Service {
                 }
             } else {
                 if (DataProviderManager.getBooleanValue(mContext, "is_channel_searching", false)) {
-                    Log.d(TAG, "Station search in progress, stop standby");
+                    logDebug(TAG, false, "Station search in progress, stop standby");
                     stopSelf();
                 } else {
                     int mode = intent.getIntExtra("mode", -1);
@@ -120,7 +115,6 @@ public class TimerSuspendService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d ( TAG, "onDestroy");
         unregisterReceiver(mScreenBroadcastReceiver);
         remove_shutdown_time();
     }
@@ -134,7 +128,7 @@ public class TimerSuspendService extends Service {
             public void onClick(View view) {
                 //checkTimeoutStatus();
                 hideDialog();
-                Log.d(TAG, "onClick");
+                logDebug(TAG, false, "onClick");
             }
         });
         mCountDownText = (TextView) suspendDialogView.findViewById(R.id.tv_dialog);
@@ -144,7 +138,7 @@ public class TimerSuspendService extends Service {
         mDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialog) {
-                Log.d(TAG, "onDismiss mSuspendCount = " + mSuspendCount);
+                logDebug(TAG, false, "onDismiss mSuspendCount = " + mSuspendCount);
                 if (mSuspendCount > 0) {
                     checkTimeoutStatus();
                 }
@@ -193,7 +187,7 @@ public class TimerSuspendService extends Service {
                         String str = mSuspendCount + " " + getResources().getString(R.string.countdown_tips);
                         mCountDownText.setText(str);
                     }
-                    Log.d(TAG, "mSuspendCount=" + mSuspendCount);
+                    logDebug(TAG, false, "mSuspendCount=" + mSuspendCount);
                     timeSuspend_handler.postDelayed(timeSuspend_runnable, 1000);
                 }
                 mSuspendCount--;
@@ -204,7 +198,7 @@ public class TimerSuspendService extends Service {
     };
 
     private void reset_shutdown_time(int time) {
-        Log.d(TAG, "reset_shutdown_time = " + time);
+        logDebug(TAG, false, "reset_shutdown_time = " + time);
         mSuspendCount =  time;
         remove_shutdown_time();
         timeSuspend_handler.post(timeSuspend_runnable);
@@ -231,11 +225,11 @@ public class TimerSuspendService extends Service {
         }
 
         alarm.setExact(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + timeout, pendingIntent);
-        Log.d(TAG, "start time count down after " + timeout + " ms");
+        logDebug(TAG, false, "start time count down after " + timeout + " ms");
     }
 
     private void cancelSleepTimer() {
-        Log.d ( TAG, "canel TIMER_SUSPEND alarm");
+        logDebug(TAG, false, "canel TIMER_SUSPEND alarm");
         AlarmManager alarm = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent("droidlogic.intent.action.TIMER_SUSPEND");
         intent.addFlags(0x01000000/*Intent.FLAG_RECEIVER_INCLUDE_BACKGROUND*/);
@@ -245,12 +239,10 @@ public class TimerSuspendService extends Service {
     }
 
     private void remove_shutdown_time() {
-        Log.d ( TAG, "remove_shutdown_time");
         timeSuspend_handler.removeCallbacksAndMessages(null);
     }
 
     private void hideDialog() {
-        Log.d ( TAG, "hideDialog");
         if (mDialog != null && mDialog.isShowing()) {
             mDialog.dismiss();
         }
@@ -258,7 +250,7 @@ public class TimerSuspendService extends Service {
 
     private void pressPowerKey () {
         if (!isSystemScreenOn()) {
-            Log.d(TAG, "pressPowerKey screen is off already");
+            logDebug(TAG, true, "pressPowerKey screen is off already");
             return;
         }
         long now = SystemClock.uptimeMillis();
@@ -271,7 +263,7 @@ public class TimerSuspendService extends Service {
     private boolean isSystemScreenOn() {
         PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
         boolean isScreenOpen = powerManager.isScreenOn();
-        Log.d(TAG, "isSystemScreenOn isScreenOpen = " + isScreenOpen);
+        logDebug(TAG, false, "isSystemScreenOn isScreenOpen = " + isScreenOpen);
         return isScreenOpen;
     }
 }

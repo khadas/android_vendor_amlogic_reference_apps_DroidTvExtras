@@ -12,16 +12,15 @@ package com.droidlogic.tv.extras.database;
 
 import android.content.Context;
 import android.content.ContentProvider;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.Cursor;
 import android.net.Uri;
 import android.content.UriMatcher;
-import android.util.Log;
 
 import com.droidlogic.app.tv.TvControlDataManager;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 public class TvControlDataProvider extends ContentProvider {
     private static final String TAG = "TvControlDataProvider";
@@ -75,8 +74,6 @@ public class TvControlDataProvider extends ContentProvider {
             db.execSQL(SQL_CREATE_TABLE2);
             db.execSQL(SQL_CREATE_TABLE3);
             db.execSQL(SQL_CREATE_TABLE4);
-
-            Log.d(TAG, "onCreate tables");
         }
 
         @Override
@@ -96,9 +93,14 @@ public class TvControlDataProvider extends ContentProvider {
         String table = getTableName(uri);
         SQLiteDatabase db = mDbOpenHelper.getReadableDatabase();
         if (db != null) {
-            if (DEBUG) Log.d(TAG, "query db = " + db.getPath() + ", SQL uri:" + (uri != null ? uri.toString() : "") + " projection:" + (projection != null ? projection.toString() : "") + " selection:" + selection + " selectionArgs:"  + (selectionArgs != null ? selectionArgs.toString() : "") + " sortOrder:" + sortOrder);
+            logDebug(TAG, false, "query db = " + db.getPath()
+                    + ", SQL uri:" + (uri != null ? uri.toString() : "")
+                    + " projection:" + (projection != null ? projection.toString() : "")
+                    + " selection:" + selection
+                    + " selectionArgs:"  + (selectionArgs != null ? selectionArgs.toString() : "")
+                    + " sortOrder:" + sortOrder);
         } else {
-            Log.d(TAG, "query db null");
+            logDebug(TAG, true, "query db null");
         }
         return db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
     }
@@ -108,9 +110,11 @@ public class TvControlDataProvider extends ContentProvider {
         String table = getTableName(uri);
         SQLiteDatabase db = mDbOpenHelper.getWritableDatabase();
         if (db != null) {
-            if (DEBUG) Log.d(TAG, "insert db = " + db.getPath() + ", SQL uri:" + (uri != null ? uri.toString() : "") + " values:" + (values != null ? values.toString() : ""));
+            logDebug(TAG, false, "insert db = " + db.getPath()
+                    + ", SQL uri:" + (uri != null ? uri.toString() : "")
+                    + " values:" + (values != null ? values.toString() : ""));
         } else {
-            Log.d(TAG, "insert db null");
+            logDebug(TAG, true, "insert db null");
         }
         db.insert(table, null, values);
         return null;
@@ -121,9 +125,13 @@ public class TvControlDataProvider extends ContentProvider {
         String table = getTableName(uri);
         SQLiteDatabase db = mDbOpenHelper.getWritableDatabase();
         if (db != null) {
-            if (DEBUG) Log.d(TAG, "update db = " + db.getPath() + ", SQL uri:" + (uri != null ? uri.toString() : "") + " values:" + (values != null ? values.toString() : "") + " selection:" + selection + " selectionArgs:"  + (selectionArgs != null ? selectionArgs.toString() : ""));
+            logDebug(TAG, false, "update db = " + db.getPath()
+                    + ", SQL uri:" + (uri != null ? uri.toString() : "")
+                    + " values:" + (values != null ? values.toString() : "")
+                    + " selection:" + selection
+                    + " selectionArgs:"  + (selectionArgs != null ? selectionArgs.toString() : ""));
         } else {
-            Log.d(TAG, "update db null");
+            logDebug(TAG, true, "update db null");
         }
         return db.update(table, values, selection, selectionArgs);
     }
@@ -133,9 +141,12 @@ public class TvControlDataProvider extends ContentProvider {
         String table = getTableName(uri);
         SQLiteDatabase db = mDbOpenHelper.getWritableDatabase();
         if (db != null) {
-            if (DEBUG) Log.d(TAG, "delete db = " + db.getPath() + ", SQL uri:" + (uri != null ? uri.toString() : "") + " selection:" + selection + " selectionArgs:"  + (selectionArgs != null ? selectionArgs.toString() : ""));
+            logDebug(TAG, false, "delete db = " + db.getPath()
+                    + ", SQL uri:" + (uri != null ? uri.toString() : "")
+                    + " selection:" + selection
+                    + " selectionArgs:"  + (selectionArgs != null ? selectionArgs.toString() : ""));
         } else {
-            Log.d(TAG, "delete db null");
+            logDebug(TAG, true, "delete db null");
         }
         return db.delete(table, selection, selectionArgs);
     }
@@ -160,6 +171,8 @@ public class TvControlDataProvider extends ContentProvider {
                 break;
             case TABLE_OTHERS_CODE:
                 tableName = TABLE_OTHERS_NAME;
+                break;
+            default:
                 break;
         }
 

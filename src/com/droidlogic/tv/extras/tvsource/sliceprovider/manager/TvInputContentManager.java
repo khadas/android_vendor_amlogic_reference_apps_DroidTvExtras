@@ -8,14 +8,12 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.SystemProperties;
 import android.text.TextUtils;
-import android.util.Log;
 import android.hardware.hdmi.HdmiDeviceInfo;
 import android.media.tv.TvInputInfo;
 import android.media.tv.TvInputManager;
 import android.provider.Settings;
 import android.hardware.hdmi.HdmiControlManager;
 import android.hardware.hdmi.HdmiTvClient;
-import android.media.tv.TvInputHardwareInfo;
 
 import com.droidlogic.tv.extras.R;
 import com.droidlogic.app.DataProviderManager;
@@ -23,7 +21,7 @@ import com.droidlogic.app.SystemControlManager;
 import com.droidlogic.app.tv.DroidLogicTvUtils;
 import com.droidlogic.app.tv.TvControlManager;
 import com.droidlogic.app.tv.TvScanConfig;
-import com.droidlogic.app.tv.ChannelInfo;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -119,7 +117,7 @@ public class TvInputContentManager {
         for (TvInputInfo input : inputList) {
             if (UserPreferredSource.equals(input.getId())) {
                 DroidLogicTvUtils.setCurrentInputId(mContext, input.getId());
-                android.util.Log.d(TAG,
+                logDebug(TAG, false,
                         "setTvInputSource: isPassthroughInput = " + input.isPassthroughInput()
                         + "\n" + "title = " + getTitle(mContext, input, audioSystem, hdmiList));
                 if (!input.isPassthroughInput()) {
@@ -140,13 +138,8 @@ public class TvInputContentManager {
                         DroidLogicTvUtils.getHardwareDeviceId(input));
 
                 SystemControlManager mSystemControlManager = SystemControlManager.getInstance();
-                if (DTVKITSOURCE.equals(input.getId())) {//DTVKIT SOURCE
-                    Log.d(TAG, "DtvKit source");
-                    mSystemControlManager.SetDtvKitSourceEnable(1);
-                } else {
-                    Log.d(TAG, "Not DtvKit source");
-                    mSystemControlManager.SetDtvKitSourceEnable(0);
-                }
+                logDebug(TAG, false, "DtvKit source = " + (DTVKITSOURCE.equals(input.getId())));
+                mSystemControlManager.SetDtvKitSourceEnable(DTVKITSOURCE.equals(input.getId()) ? 1 : 0);
                 Intent intent = new Intent(TvInputManager.ACTION_SETUP_INPUTS);
                 intent.putExtra("from_tv_source", true);
                 intent.putExtra(TvInputInfo.EXTRA_INPUT_ID, input.getId());
@@ -171,14 +164,14 @@ public class TvInputContentManager {
                     (tvInputInfo.isPassthroughInput() && tvInputInfo.getParentId() != null));
             return inputList;
         } catch (Exception e) {
-            Log.d(TAG, "inputList is "+e);
+            logDebug(TAG, true, "inputList is " + e.getMessage());
         }
         return null;
     }
 
     public List<HdmiDeviceInfo> getHdmiList() {
         if (mTvClient == null) {
-            Log.e(TAG, "mTvClient null!");
+            logDebug(TAG, true, "mTvClient null!");
             return null;
         }
         return mTvClient.getDeviceList();
@@ -246,7 +239,7 @@ public class TvInputContentManager {
 
     public HdmiDeviceInfo getOrigHdmiDevice(int logicalAddress, List<HdmiDeviceInfo> hdmiList) {
         if (hdmiList == null) {
-            Log.d(TAG, "mTvInputManager or mTvClient maybe null");
+            logDebug(TAG, true, "mTvInputManager or mTvClient maybe null");
             return null;
         }
         for (HdmiDeviceInfo info : hdmiList) {
@@ -266,8 +259,9 @@ public class TvInputContentManager {
         } else {
             title = customLabel;
         }
-        Log.d(TAG, "getTitle default " + title + ", label = " + label + ", customLabel = " + customLabel);
-        android.util.Log.d(TAG, "getTitle: portId = " + DroidLogicTvUtils.getPortId(input));
+        logDebug(TAG, true, "getTitle default " + title
+                + ", label = " + label + ", customLabel = " + customLabel);
+        logDebug(TAG, true, "getTitle: portId = " + DroidLogicTvUtils.getPortId(input));
         if (input.isPassthroughInput()) {
             int portId = DroidLogicTvUtils.getPortId(input);
             if (audioSystem != null && audioSystem.getPortId() == portId) {
@@ -285,13 +279,13 @@ public class TvInputContentManager {
         } else if (TextUtils.isEmpty(title)) {
             title = input.getServiceInfo().name;
         }
-        Log.d(TAG, "getTitle " + title);
+        logDebug(TAG, true, "getTitle " + title);
         return title;
     }
 
     private HdmiDeviceInfo getOrigHdmiDeviceByPort(int portId, List<HdmiDeviceInfo> hdmiList) {
         if (hdmiList == null) {
-            Log.d(TAG, "mTvInputManager or mTvClient maybe null");
+            logDebug(TAG, true, "mTvInputManager or mTvClient maybe null");
             return null;
         }
         for (HdmiDeviceInfo info : hdmiList) {
@@ -316,7 +310,7 @@ public class TvInputContentManager {
                 title = input.getServiceInfo().name;
             }
         }
-        Log.d(TAG, "getTitleForTuner title " + title + " for package " + packageName);
+        logDebug(TAG, true, "getTitleForTuner title " + title + " for package " + packageName);
         return title;
     }
 

@@ -18,17 +18,11 @@ package com.droidlogic.tv.extras.pqsettings;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Resources;
-import android.text.TextUtils;
-import android.util.Log;
-import android.os.SystemProperties;
-import android.provider.Settings;
-import android.widget.Toast;
 
 import com.droidlogic.tv.extras.R;
 import com.droidlogic.tv.extras.SettingsConstant;
-import com.droidlogic.tv.extras.util.DroidUtils;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 import com.droidlogic.app.SystemControlManager;
 import com.droidlogic.app.tv.TvControlManager;
@@ -144,29 +138,25 @@ public class PQSettingsManager {
             mVirtualTvSource = mTvSource;
 
             if (mTvSource == TvControlManager.SourceInput_Type.SOURCE_TYPE_ADTV) {
-                Log.d(TAG, "channelId: " + mChannelId);
+                logDebug(TAG, false, "channelId: " + mChannelId);
                 currentChannel = mTvDataBaseManager.getChannelInfo(TvContract.buildChannelUri(mChannelId));
                 if (currentChannel != null) {
                     mVideoStd = currentChannel.getVideoStd();
                     mTvSource = DroidLogicTvUtils.parseTvSourceTypeFromSigType(DroidLogicTvUtils.getSigType(currentChannel));
                     mTvSourceInput = DroidLogicTvUtils.parseTvSourceInputFromSigType(DroidLogicTvUtils.getSigType(currentChannel));
-                    Log.d(TAG, "currentChannel != null");
+                    logDebug(TAG, false, "currentChannel != null");
                 } else {
                     mVideoStd = -1;
-                    Log.d(TAG, "currentChannel == null");
+                    logDebug(TAG, false, "currentChannel == null");
                 }
                 if (mVirtualTvSource == mTvSource) {//no channels in adtv input, DTV for default.
                     mTvSource = TvControlManager.SourceInput_Type.SOURCE_TYPE_DTV;
                     mTvSourceInput = TvControlManager.SourceInput.DTV;
-                    Log.d(TAG, "no channels in adtv input, DTV for default.");
+                    logDebug(TAG, false, "no channels in adtv input, DTV for default.");
                 }
             }
         }
-        Log.d(TAG, "mDeviceId: " + mDeviceId);
-    }
-
-    static public boolean CanDebug() {
-        return DroidUtils.CanDebug();
+        logDebug(TAG, true, "mDeviceId: " + mDeviceId);
     }
 
     public static final int PIC_STANDARD = 0;
@@ -196,7 +186,7 @@ public class PQSettingsManager {
 
     public String getPictureModeStatus () {
         int pictureModeIndex = mSystemControlManager.GetPQMode();
-        if (CanDebug()) Log.d(TAG, "getPictureModeStatus : " + pictureModeIndex);
+        logDebug(TAG, false, "getPictureModeStatus : " + pictureModeIndex);
         switch (pictureModeIndex) {
             case PIC_STANDARD:
                 return STATUS_STANDARD;
@@ -241,7 +231,7 @@ public class PQSettingsManager {
                 || vrrModeId == FreeSync_Premium_G_SYNC) {
             vrrModeName = "(" + mTvControlManager.GetVRRModeString() + ")";
         }
-        if (CanDebug()) { Log.d(TAG, "vrrModeId:" + vrrModeId + " vrrModeName:" + vrrModeName);}
+        logDebug(TAG, false, "vrrModeId:" + vrrModeId + " vrrModeName:" + vrrModeName);
         return vrrModeName;
     }
 
@@ -251,20 +241,20 @@ public class PQSettingsManager {
      * 0:off
      */
     public void setDolbyDarkDetail(boolean enableDarkDetail) {
-        if (CanDebug()) { Log.d(TAG, "enableDarkDetail: " + enableDarkDetail);}
+        logDebug(TAG, false, "enableDarkDetail: " + enableDarkDetail);
         mSystemControlManager.SetDolbyDarkDetail(enableDarkDetail ? 1 : 0, mSave);
     }
 
     public boolean getDolbyDarkDetail(){
         int GetDolbyDarkDetailId = mSystemControlManager.GetDolbyDarkDetail();
-        if (CanDebug()) {Log.d(TAG, "GetDolbyDarkDetail: "+ GetDolbyDarkDetailId);}
+        logDebug(TAG, false, "GetDolbyDarkDetail: "+ GetDolbyDarkDetailId);
 
         return GetDolbyDarkDetailId == 1 ? true : false; //1 is on ,0 is off
     }
 
     public boolean getVrr() {
         int vrrEnabled = mTvControlManager.GetVRREnable();
-        if (CanDebug()) { Log.d(TAG, "vrrEnabled: " + vrrEnabled); }
+        logDebug(TAG, false, "vrrEnabled: " + vrrEnabled);
         return vrrEnabled == 1 ? true : false; //1 is on ,0 is off
     }
 
@@ -273,7 +263,7 @@ public class PQSettingsManager {
      * 1:enable; 0:disable
      */
     public void setVrr(boolean enableVrr) {
-        if (CanDebug()) { Log.d(TAG, "enableVrr: " + enableVrr); }
+        logDebug(TAG, false, "enableVrr: " + enableVrr);
         mTvControlManager.SetVRREnable(enableVrr ? 1 : 0);
     }
 
@@ -295,7 +285,8 @@ public class PQSettingsManager {
             default:
                 break;
         }
-        Log.d(TAG, "currentSourceInput:" + currentSourceInput + " hdmiPortId: " + hdmiPortId);
+        logDebug(TAG, false, "currentSourceInput:" + currentSourceInput
+                + " hdmiPortId: " + hdmiPortId);
         return hdmiPortId;
     }
 
@@ -308,49 +299,49 @@ public class PQSettingsManager {
         }
       // edidversion: Hdmi2.0 state: 0 off, 1 on
         int hdmiEdidVersion = mTvControlManager.GetHdmiEdidVersion(hdmiPortIdEnum);
-        if (CanDebug()) {Log.d(TAG, "hdmiEdidVersion: " + hdmiEdidVersion);}
+        logDebug(TAG, false, "hdmiEdidVersion: " + hdmiEdidVersion);
 
         return hdmiEdidVersion != 0 ? true : false;
     }
 
     public String getChipVersionInfo () {
         String chipVersion = mSystemControlManager.getChipVersionInfo();
-        if (CanDebug()) Log.d(TAG, "getChipVersionInfo: "+chipVersion);
+        logDebug(TAG, false, "getChipVersionInfo: "+chipVersion);
         return chipVersion;
     }
 
     public int getBrightnessStatus () {
         int value = mSystemControlManager.GetBrightness();
-        if (CanDebug()) Log.d(TAG, "getBrightnessStatus : " + value);
+        logDebug(TAG, false, "getBrightnessStatus : " + value);
         return value;
     }
 
     public int getContrastStatus () {
         int value = mSystemControlManager.GetContrast();
-        if (CanDebug()) Log.d(TAG, "getContrastStatus : " + value);
+        logDebug(TAG, false, "getContrastStatus : " + value);
         return value;
     }
 
     public int getColorStatus () {
         int value = mSystemControlManager.GetSaturation();
-        if (CanDebug()) Log.d(TAG, "getColorStatus : " + value);
+        logDebug(TAG, false, "getColorStatus : " + value);
         return value;
     }
 
     public int getSharpnessStatus () {
         int value = mSystemControlManager.GetSharpness();
-        if (CanDebug()) Log.d(TAG, "getSharpnessStatus : " + value);
+        logDebug(TAG, false, "getSharpnessStatus : " + value);
         return value;
     }
 
     public int getToneStatus () {
         int value = mSystemControlManager.GetHue();
-        if (CanDebug()) Log.d(TAG, "getTintStatus : " + value);
+        logDebug(TAG, false, "getTintStatus : " + value);
         return value;
     }
 
     public int getPictureModeSource () {
-        if (CanDebug()) Log.d(TAG, "getPictureModeSource");
+        logDebug(TAG, false, "getPictureModeSource");
         return mSystemControlManager.GetSourceHdrType();
     }
 
@@ -374,349 +365,314 @@ public class PQSettingsManager {
 
     public int getAspectRatioStatus () {
         int itemPosition = mSystemControlManager.GetDisplayMode(TvControlManager.SourceInput.XXXX.toInt());
-        if (CanDebug()) Log.d(TAG, "getAspectRatioStatus:" + itemPosition);
-        if (itemPosition == SystemControlManager.Display_Mode.DISPLAY_MODE_MODE43.toInt())
+        logDebug(TAG, false, "getAspectRatioStatus:" + itemPosition);
+        if (itemPosition == SystemControlManager.Display_Mode.DISPLAY_MODE_MODE43.toInt()) {
             return Aspect_Ratio_Mode.ASPEC_RATIO_43.toInt();
-        else if (itemPosition == SystemControlManager.Display_Mode.DISPLAY_MODE_FULL.toInt())
+        } else if (itemPosition == SystemControlManager.Display_Mode.DISPLAY_MODE_FULL.toInt()) {
             return Aspect_Ratio_Mode.ASPEC_RATIO_PANORAMA.toInt();
-        else if (itemPosition == SystemControlManager.Display_Mode.DISPLAY_MODE_169.toInt())
+        } else if (itemPosition == SystemControlManager.Display_Mode.DISPLAY_MODE_169.toInt()) {
             return Aspect_Ratio_Mode.ASPEC_RATIO_FULL_SCREEN.toInt();
-        else if (itemPosition == SystemControlManager.Display_Mode. DISPLAY_MODE_NOSCALEUP.toInt())
+        } else if (itemPosition == SystemControlManager.Display_Mode. DISPLAY_MODE_NOSCALEUP.toInt()) {
             return Aspect_Ratio_Mode.ASPEC_RATIO_DOT_BY_NOT.toInt();
-        else
+        } else {
             return Aspect_Ratio_Mode.ASPEC_RATIO_AUTO.toInt();
+        }
     }
 
     public int GetSourceHdrType() {
         int sourceHdrType = mSystemControlManager.GetSourceHdrType();
-        if (CanDebug()) {
-            Log.d(TAG, "GetSourceHdrType: " + sourceHdrType);
-        }
+        logDebug(TAG, false, "GetSourceHdrType: " + sourceHdrType);
         return sourceHdrType;
     }
 
     public int getAdvancedDynamicToneMappingStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedDynamicToneMappingStatus");
+        logDebug(TAG, false, "getAdvancedDynamicToneMappingStatus");
         int dynamicToneMappingStatus = mSystemControlManager.GetHDRTMOMode();
         return dynamicToneMappingStatus != -1 ? dynamicToneMappingStatus: 0;//0 is on ,1 is off
     }
 
     public int getAdvancedColorManagementStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorManagementStatus");
+        logDebug(TAG, false, "getAdvancedColorManagementStatus");
         int colorManagementStatus = mSystemControlManager.GetColorBaseMode();
         return colorManagementStatus != -1 ? colorManagementStatus : 0;
     }
 
     public int getAdvancedColorSpaceStatus () {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorSpaceStatus");
+        logDebug(TAG, false, "getAdvancedColorSpaceStatus");
         return 0;
     }
 
     public int getAdvancedGlobalDimmingStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedGlobalDimmingStatus");
+        logDebug(TAG, false, "getAdvancedGlobalDimmingStatus");
         return mSystemControlManager.GetDynamicBacklight();
     }
 
     public int getAdvancedLocalDimmingStatus () {
         int dimmingStatus = mSystemControlManager.GetLocalDimming();
-        if (CanDebug()) Log.d(TAG, "getAdvancedLocalDimmingStatus:" + dimmingStatus);
+        logDebug(TAG, false, "getAdvancedLocalDimmingStatus:" + dimmingStatus);
         return dimmingStatus;
     }
 
     public int getAdvancedBlackStretchStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedBlackStretchStatus");
+        logDebug(TAG, false, "getAdvancedBlackStretchStatus");
         return mSystemControlManager.GetBlackExtensionMode();
     }
 
     public int getAdvancedDNLPStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedDNLPStatus");
+        logDebug(TAG, false, "getAdvancedDNLPStatus");
         int CurrentSourceInfo[] = mSystemControlManager.GetCurrentSourceInfo();
         int DNLPStatus = mSystemControlManager.getDNLPCurveParams(SystemControlManager.SourceInput.valueOf(CurrentSourceInfo[0]), SystemControlManager.SignalFmt.valueOf(CurrentSourceInfo[1]), SystemControlManager.TransFmt.valueOf(CurrentSourceInfo[2]));
         return DNLPStatus != -1? DNLPStatus :0;
     }
 
     public int getAdvancedLocalContrastStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedLocalContrastStatus");
+        logDebug(TAG, false, "getAdvancedLocalContrastStatus");
         return mSystemControlManager.GetLocalContrastMode();
     }
 
     public int getAdvancedSRStatus () {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedSRStatus");
+        logDebug(TAG, false, "getAdvancedSRStatus");
         return 0;
     }
 
     public int getAdvancedDeBlockStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedDeBlockStatus");
+        logDebug(TAG, false, "getAdvancedDeBlockStatus");
         int deBlockStatus = mSystemControlManager.GetDeblockMode();
         return deBlockStatus != -1? deBlockStatus :0;
     }
 
     public int getAdvancedDeMosquitoStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedDeMosquitoStatus");
+        logDebug(TAG, false, "getAdvancedDeMosquitoStatus");
         int deMosquitoStatus = mSystemControlManager.GetDemoSquitoMode();
         return deMosquitoStatus != -1? deMosquitoStatus :0;
     }
 
     public int getAdvancedDecontourStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedDecontourStatus");
+        logDebug(TAG, false, "getAdvancedDecontourStatus");
         return mSystemControlManager.GetSmoothPlusMode();
     }
 
     public int getAdvancedMemcSwitchStatus () {
         memcStatus = mSystemControlManager.GetMemcMode();
-        Log.d(TAG, "getAdvancedGlobalDimmingStatus value: " + memcStatus);
+        logDebug(TAG, false, "getAdvancedGlobalDimmingStatus value: " + memcStatus);
         return memcStatus;
     }
 
     public int getAdvancedMemcCustomizeDejudderStatus () {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedMemcCustomizeDejudderStatus");
+        logDebug(TAG, false, "getAdvancedMemcCustomizeDejudderStatus");
         return 5;
     }
 
     public int getAdvancedMemcCustomizeDeblurStatus () {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedMemcCustomizeDeblurStatus");
+        logDebug(TAG, false, "getAdvancedMemcCustomizeDeblurStatus");
         return 5;
     }
 
     public int getAdvancedGammaStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedGammaStatus");
         return mSystemControlManager.GetGammaValue() + ADVANCED_GAMMA_FIXED_DIFFERENCE;
     }
 
     public int getAdvancedManualGammaLevelStatus () {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedManualGammaLevelStatus");
+        logDebug(TAG, false, "getAdvancedManualGammaLevelStatus");
         return 0;
     }
 
     public int getAdvancedManualGammaRGainStatus () {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedManualGammaRGainStatus");
+        logDebug(TAG, false, "getAdvancedManualGammaRGainStatus");
         return 0;
     }
 
     public int getAdvancedManualGammaGGainStatus () {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedManualGammaGGainStatus");
+        logDebug(TAG, false, "getAdvancedManualGammaGGainStatus");
         return 0;
     }
 
     public int getAdvancedManualGammaBGainStatus () {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedManualGammaBGainStatus");
+        logDebug(TAG, false, "getAdvancedManualGammaBGainStatus");
         return 0;
     }
 
     public int getColorTemperatureStatus () {
         int itemPosition = mSystemControlManager.GetColorTemperature();
-        if (CanDebug()) Log.d(TAG, "getColorTemperatureStatus : " + itemPosition);
+        logDebug(TAG, false, "getColorTemperatureStatus : " + itemPosition);
         return itemPosition;
     }
 
     public int getAdvancedColorTemperatureRGainStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorTemperatureRGainStatus");
         return mSystemControlManager.GetColorTemperatureUserParam().r_gain;
     }
 
     public int getAdvancedColorTemperatureGGainStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorTemperatureGGainStatus");
         return mSystemControlManager.GetColorTemperatureUserParam().g_gain;
     }
 
     public int getAdvancedColorTemperatureBGainStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorTemperatureBGainStatus");
         return mSystemControlManager.GetColorTemperatureUserParam().b_gain;
     }
 
     public int getAdvancedColorTemperatureROffsetStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorTemperatureROffsetStatus");
         return mSystemControlManager.GetColorTemperatureUserParam().r_offset;
     }
 
     public int getAdvancedColorTemperatureGOffsetStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorTemperatureGOffsetStatus");
         return mSystemControlManager.GetColorTemperatureUserParam().g_offset;
     }
 
     public int getAdvancedColorTemperatureBOffsetStatus () {
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorTemperatureBOffsetStatus");
         return mSystemControlManager.GetColorTemperatureUserParam().b_offset;
     }
 
     public int getDnrStatus () {
         int itemPosition = mSystemControlManager.GetNoiseReductionMode();
-        if (CanDebug()) Log.d(TAG, "getDnrStatus : " + itemPosition);
+        logDebug(TAG, false, "getDnrStatus : " + itemPosition);
         return itemPosition;
     }
 
     public int getAdvancedColorCustomizeCyanSaturationStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeCyanSaturationStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeCyanLumaStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeCyanLumaStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeCyanHueStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeCyanHueStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeBlueSaturationStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeBlueSaturationStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeBlueLumaStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeBlueLumaStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeBlueHueStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeBlueHueStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeBlueGreenSaturationStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeBlueGreenSaturationStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeBlueGreenLumaStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeBlueGreenLumaStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeBlueGreenHueStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeBlueGreenHueStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeGreenSaturationStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeGreenSaturationStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeGreenLumaStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeGreenLumaStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeGreenHueStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeGreenHueStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeMagentaSaturationStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeMagentaSaturationStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeMagentaLumaStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeMagentaLumaStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeMagentaHueStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeMagentaHueStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeRedSaturationStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeRedSaturationStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeRedLumaStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeRedLumaStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeRedHueStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeRedHueStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeSkinSaturationStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeSkinSaturationStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeSkinLumaStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeSkinLumaStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeSkinHueStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeSkinHueStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeYellowSaturationStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeYellowSaturationStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeYellowLumaStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeYellowLumaStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeYellowHueStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeYellowHueStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeYellowGreenSaturationStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeYellowGreenSaturationStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeYellowGreenLumaStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeYellowGreenLumaStatus");
         return 0;
     }
 
     public int getAdvancedColorCustomizeYellowGreenHueStatus() {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedColorCustomizeYellowGreenHueStatus");
         return 0;
     }
 
     public void setPictureMode (String mode) {
-        if (CanDebug()) Log.d(TAG, "setPictureMode : " + mode);
+        logDebug(TAG, false, "setPictureMode : " + mode);
         if (mode.equals(STATUS_STANDARD)) {
             mSystemControlManager.SetPQMode(PIC_STANDARD, mSave, 0);
         } else if (mode.equals(STATUS_VIVID)) {
@@ -745,7 +701,7 @@ public class PQSettingsManager {
     }
 
     public void setPictureModeSDR (String mode) {
-        if (CanDebug()) Log.d(TAG, "setPictureModeSDR : " + mode);
+        logDebug(TAG, false, "setPictureModeSDR : " + mode);
         if (mode.equals(STATUS_GAME)) {
             mAudioManager.setParameters(PARAM_HAL_PICTRUE_MODE_GAME);
         } else {
@@ -754,32 +710,31 @@ public class PQSettingsManager {
     }
 
     public void setBrightness(int step) {
-        int PQMode = mSystemControlManager.GetPQMode();
-        if (CanDebug()) Log.d(TAG, "setBrightness step : " + step);
+        logDebug(TAG, false, "setBrightness step : " + step);
         int brightness = mSystemControlManager.GetBrightness();
         mSystemControlManager.SetBrightness(brightness + step, 1);
     }
 
     public void setContrast(int step) {
-        if (CanDebug()) Log.d(TAG, "setContrast step : " + step);
+        logDebug(TAG, false, "setContrast step : " + step);
         int contrast = mSystemControlManager.GetContrast();
         mSystemControlManager.SetContrast(contrast + step, 1);
     }
 
     public void setColor(int step) {
-        if (CanDebug()) Log.d(TAG, "setColor step : " + step);
+        logDebug(TAG, false, "setColor step : " + step);
         int saturation = mSystemControlManager.GetSaturation();
         mSystemControlManager.SetSaturation(saturation + step, 1);
     }
 
     public void setSharpness(int step) {
-        if (CanDebug()) Log.d(TAG, "setSharpness step : " + step);
+        logDebug(TAG, false, "setSharpness step : " + step);
         int sharpness = mSystemControlManager.GetSharpness();
         mSystemControlManager.SetSharpness(sharpness + step, 1, 1);
     }
 
     public void setTone(int step) {
-        if (CanDebug()) Log.d(TAG, "setTint step : " + step);
+        logDebug(TAG, false, "setTint step : " + step);
         int hue = mSystemControlManager.GetHue();
         mSystemControlManager.SetHue(hue + step, 1);
     }
@@ -811,7 +766,7 @@ public class PQSettingsManager {
             }
             info = mTvControlManager.GetCurrentSignalInfo();
             if (info.sigStatus == TvInSignalInfo.SignalStatus.TVIN_SIG_STATUS_STABLE) {
-                if (CanDebug()) Log.d(TAG, "ATV NTSC mode signal is stable, show Tint");
+                logDebug(TAG, false, "ATV NTSC mode signal is stable, show Tint");
                 return true;
             }
         } else if (mTvSource == TvControlManager.SourceInput_Type.SOURCE_TYPE_AV) {
@@ -822,7 +777,7 @@ public class PQSettingsManager {
             if (info.sigStatus == TvInSignalInfo.SignalStatus.TVIN_SIG_STATUS_STABLE) {
                 String[] strings = info.sigFmt.toString().split("_");
                 if (strings[4].contains("NTSC")) {
-                    if (CanDebug()) Log.d(TAG, "AV NTSC mode signal is stable, show Tint");
+                    logDebug(TAG, false, "AV NTSC mode signal is stable, show Tint");
                     return true;
                 }
             }
@@ -837,7 +792,7 @@ public class PQSettingsManager {
     }
 
     public void setAspectRatio(int mode) {
-        if (CanDebug()) Log.d(TAG, "setAspectRatio:" + mode);
+        logDebug(TAG, false, "setAspectRatio:" + mode);
         int source = TvControlManager.SourceInput.XXXX.toInt();
         if (mode == 0) {
             mSystemControlManager.SetDisplayMode(source, SystemControlManager.Display_Mode.DISPLAY_MODE_NORMAL, 1);
@@ -854,13 +809,14 @@ public class PQSettingsManager {
 
     public boolean hasAipqFunc() {
         boolean isAipqFun = mSystemControlManager.hasAipqFunc();
-        Log.d(TAG, "hasAipqFunc: " + isAipqFun);
+        logDebug(TAG, false, "hasAipqFunc: " + isAipqFun);
         return isAipqFun;
     }
 
     public boolean getAipqEnabled() {
-        Log.d(TAG, "getAipqEnabled:" + mSystemControlManager.getAipqEnable());
-        return mSystemControlManager.getAipqEnable();
+        boolean aipqEnabled = mSystemControlManager.getAipqEnable();
+        logDebug(TAG, false, "getAipqEnabled:" + aipqEnabled);
+        return aipqEnabled;
     }
 
     public void setAipqEnabled(boolean enable) {
@@ -875,26 +831,21 @@ public class PQSettingsManager {
     }
 
     public void setAisrEnabled(boolean enable) {
-        //mSystemControlManager.setAiSrEnable(enable);
         mSystemControlManager.aisrContrl(enable);
     }
 
     public boolean hasAisrFunc() {
-        if (CanDebug()) {
-            Log.d(TAG, "hasAisrFunc");
-        }
         return mSystemControlManager.hasAisrFunc();
     }
 
     public void setAdvancedDynamicToneMappingStatus (int value) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedDynamicToneMappingStatus value:"+value);
+        logDebug(TAG, false, "setAdvancedDynamicToneMappingStatus value:"+value);
         mSystemControlManager.SetHDRTMOMode(value, 1);
     }
 
     public void setAdvancedColorManagementStatus (int value) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedColorManagementStatus value:"+value);
         switch (value) {
                 case 0:
                     mSystemControlManager.SetColorBaseMode( SystemControlManager.ColorBaseMode.COLOR_BASE_MODE_OFF, 1);// off
@@ -916,7 +867,7 @@ public class PQSettingsManager {
 
     public void setAdvancedColorSpaceStatus (int value) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedColorSpaceStatus value:"+value);
+        logDebug(TAG, false, "setAdvancedColorSpaceStatus value:"+value);
         switch (value) {
                 case 0:
                     // auto
@@ -940,33 +891,28 @@ public class PQSettingsManager {
     }
 
     public void setAdvancedGlobalDimmingStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedGlobalDimmingStatus value:"+value);
+        logDebug(TAG, false, "setAdvancedGlobalDimmingStatus value:"+value);
         mSystemControlManager.SetDynamicBacklight(SystemControlManager.Dynamic_Backlight_Mode.valueOf(value), 1);
     }
 
     public void setAdvancedLocalDimmingStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedLocalDimmingStatus value:"+value);
+        logDebug(TAG, false, "setAdvancedLocalDimmingStatus value:"+value);
         mSystemControlManager.SetLocalDimming(value, mSave);
     }
 
     public void setAdvancedBlackStretchStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedBlackStretchStatus value:"+value);
+        logDebug(TAG, false, "setAdvancedBlackStretchStatus value:"+value);
         mSystemControlManager.SetBlackExtensionMode(SystemControlManager.Black_Extension_Mode.valueOf(value), 1);
     }
 
     public void setAdvancedDNLPStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedDNLPStatus value:"+value);
+        logDebug(TAG, false, "setAdvancedDNLPStatus value:"+value);
         int CurrentSourceInfo[] = mSystemControlManager.GetCurrentSourceInfo();
         mSystemControlManager.setDNLPCurveParams(SystemControlManager.SourceInput.valueOf(CurrentSourceInfo[0]), SystemControlManager.SignalFmt.valueOf(CurrentSourceInfo[1]), SystemControlManager.TransFmt.valueOf(CurrentSourceInfo[2]), value);
     }
 
     public void setAdvancedLocalContrastStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedLocalContrastStatus value:"+value);
+        logDebug(TAG, false, "setAdvancedLocalContrastStatus value:"+value);
         switch (value) {
                 case 0:
                     mSystemControlManager.SetLocalContrastMode(SystemControlManager.Local_Contrast_Mode.LOCAL_CONTRAST_MODE_OFF,1);// off
@@ -988,7 +934,7 @@ public class PQSettingsManager {
 
     public void setAdvancedSRStatus (int value) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedSRStatus value:"+value);
+        logDebug(TAG, false, "setAdvancedSRStatus value:"+value);
         switch (value) {
                 case 0:
                     // off
@@ -1006,85 +952,59 @@ public class PQSettingsManager {
     }
 
     public void setAdvancedDeBlockStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedDeBlockStatus value:"+value);
+        logDebug(TAG, false, "setAdvancedDeBlockStatus value:"+value);
         mSystemControlManager.SetDeblockMode(SystemControlManager.Deblock_Mode.valueOf(value), 1);
     }
 
     public void setAdvancedDeMosquitoStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedDeMosquitoStatus value:"+value);
+        logDebug(TAG, false, "setAdvancedDeMosquitoStatus value:"+value);
         mSystemControlManager.SetDemoSquitoMode(SystemControlManager.DemoSquito_Mode.valueOf(value), 1);
     }
 
     public void setAdvancedDecontourStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedDecontourStatus value:"+value);
+        logDebug(TAG, false, "setAdvancedDecontourStatus value:"+value);
         mSystemControlManager.SetSmoothPlusMode(value, 1);
     }
 
     public void setAdvancedMemcSwitchStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedGlobalDimmingStatus value:"+value);
-        /*switch (value) {
-                case 0:
-                    mSystemControlManager.memcContrl(false);// off
-                    break;
-                case 1:
-                    mSystemControlManager.memcContrl(true);// on
-                    break;
-                default:
-                    mSystemControlManager.memcContrl(false);// off
-                    break;
-        }*/
         mSystemControlManager.SetMemcMode(value, memcSave);
     }
 
     public void setAdvancedGammaStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedGammaStatus");
         mSystemControlManager.SetGammaValue(value - ADVANCED_GAMMA_FIXED_DIFFERENCE, 1);
     }
 
     public void setAdvancedManualGammaLevelStatus (int value) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaLevelStatus");
     }
 
     public void setAdvancedManualGammaRGainStatus (int value) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaRGainStatus");
     }
 
     public void setAdvancedManualGammaGGainStatus (int value) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaGGainStatus");
     }
 
     public void setAdvancedManualGammaBGainStatus (int value) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedMemcCustomizeDejudderStatus (int value) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "getAdvancedMemcSwitchStatus");
     }
 
     public void setAdvancedMemcCustomizeDeblurStatus (int value) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedMemcCustomizeDeblurStatus");
     }
 
     // 0 1 2 3 ~ standard warm1 cool warm2
     public void setColorTemperature(int mode) {
-        if (CanDebug())  Log.d(TAG, "setColorTemperature : " + mode);
+        logDebug(TAG, false, "setColorTemperature : " + mode);
         mSystemControlManager.SetColorTemperature(mode, 1);
     }
 
     public void setAdvancedColorTemperatureRGainStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedColorTemperatureRGainStatus");
         int currentColorTemperatureType = mSystemControlManager.GetColorTemperature();
         switch (currentColorTemperatureType) {
                 case 0:
@@ -1106,8 +1026,6 @@ public class PQSettingsManager {
     }
 
     public void setAdvancedColorTemperatureGGainStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedColorTemperatureGGainStatus");
         int currentColorTemperatureType = mSystemControlManager.GetColorTemperature();
         switch (currentColorTemperatureType) {
                 case 0:
@@ -1129,8 +1047,6 @@ public class PQSettingsManager {
     }
 
     public void setAdvancedColorTemperatureBGainStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedColorTemperatureBGainStatus");
         int currentColorTemperatureType = mSystemControlManager.GetColorTemperature();
         switch (currentColorTemperatureType) {
                 case 0:
@@ -1152,8 +1068,6 @@ public class PQSettingsManager {
     }
 
     public void setAdvancedColorTemperatureROffsetStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedColorTemperatureROffsetStatus");
         int currentColorTemperatureType = mSystemControlManager.GetColorTemperature();
         switch (currentColorTemperatureType) {
                 case 0:
@@ -1175,8 +1089,6 @@ public class PQSettingsManager {
     }
 
     public void setAdvancedColorTemperatureGOffsetStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedColorTemperatureGOffsetStatus");
         int currentColorTemperatureType = mSystemControlManager.GetColorTemperature();
         switch (currentColorTemperatureType) {
                 case 0:
@@ -1198,8 +1110,6 @@ public class PQSettingsManager {
     }
 
     public void setAdvancedColorTemperatureBOffsetStatus (int value) {
-        // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedColorTemperatureBOffsetStatus");
         int currentColorTemperatureType = mSystemControlManager.GetColorTemperature();
         switch (currentColorTemperatureType) {
                 case 0:
@@ -1222,147 +1132,120 @@ public class PQSettingsManager {
 
     //0 1 2 3 4 ~ off low medium high auto
     public void setDnr (int mode) {
-        if (CanDebug()) Log.d(TAG, "setDnr : "+ mode);
+        logDebug(TAG, false, "setDnr : "+ mode);
         mSystemControlManager.SetNoiseReductionMode(mode, 1);
     }
 
     public void setAdvancedColorCustomizeBlueSaturationStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeBlueLumaStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeBlueHueStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeBlueGreenSaturationStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeBlueGreenLumaStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeBlueGreenHueStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeCyanSaturationStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeCyanLumaStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeCyanHueStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeGreenSaturationStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeGreenLumaStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeGreenHueStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeMagentaSaturationStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeMagentaLumaStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeMagentaHueStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeRedSaturationStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeRedLumaStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeRedHueStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeSkinSaturationStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeSkinLumaStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeSkinHueStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeYellowSaturationStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeYellowLumaStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeYellowHueStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeYellowGreenSaturationStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeYellowGreenLumaStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     public void setAdvancedColorCustomizeYellowGreenHueStatus(int step) {
         // Leave blank first, add later
-        if (CanDebug()) Log.d(TAG, "setAdvancedManualGammaBGainStatus");
     }
 
     private int setPictureUserMode(String key) {
-        if (CanDebug()) Log.d(TAG, "setPictureUserMode : "+ key);
+        logDebug(TAG, false, "setPictureUserMode : "+ key);
         int brightness = mSystemControlManager.GetBrightness();
         int contrast = mSystemControlManager.GetContrast();
         int color = mSystemControlManager.GetSaturation();
@@ -1381,9 +1264,11 @@ public class PQSettingsManager {
             case PIC_GAME:
                 setPictureMode(STATUS_USER);
                 break;
+            default:
+                break;
         }
 
-        if (CanDebug()) Log.d(TAG, " brightness=" + brightness + " contrast=" + contrast + " color=" + color + " sharp=" + sharpness);
+        logDebug(TAG, false, " brightness=" + brightness + " contrast=" + contrast + " color=" + color + " sharp=" + sharpness);
         if (!key.equals(KEY_BRIGHTNESS))
             mSystemControlManager.SetBrightness(brightness, 1);
         else
@@ -1412,19 +1297,19 @@ public class PQSettingsManager {
     }
 
     public void setBacklightValue (int value) {
-        if (CanDebug()) Log.d(TAG, "setBacklightValue : "+ value);
+        logDebug(TAG, false, "setBacklightValue : "+ value);
         mSystemControlManager.SetBacklight(getBacklightStatus() + value, 1);
     }
 
     public int getBacklightStatus () {
         int value = mSystemControlManager.GetBacklight();
-        if (CanDebug()) Log.d(TAG, "getBacklightStatus : " + value);
+        logDebug(TAG, false, "getBacklightStatus : " + value);
         return value;
     }
 
     public int SSMRecovery() {
         int value = mSystemControlManager.SSMRecovery();
-        if (CanDebug()) Log.d(TAG, "SSMRecovery : " + value);
+        logDebug(TAG, false, "SSMRecovery : " + value);
         if (value == 1) {
             //srcInputParam not used
             SourceInputParam srcInputParam= new SourceInputParam();
@@ -1438,7 +1323,7 @@ public class PQSettingsManager {
     private static final int LIMIT_RANGE = 2;
 
     public void setHdmiColorRangeValue (int value) {
-        if (CanDebug()) Log.d(TAG, "setHdmiColorRangeValue : "+ value);
+        logDebug(TAG, false, "setHdmiColorRangeValue : "+ value);
         TvControlManager.HdmiColorRangeMode hdmicolor = TvControlManager.HdmiColorRangeMode.AUTO_RANGE;
         switch (value) {
             case AUTO_RANGE :
@@ -1470,21 +1355,16 @@ public class PQSettingsManager {
         if (mTvControlManager != null) {
             value = mTvControlManager.GetHdmiColorRangeMode();
         }
-        Log.d(TAG, "getHdmiColorRangeStatus : " + value);
+        logDebug(TAG, false, "getHdmiColorRangeStatus : " + value);
         return value;
     }
 
     public int getAiColor() {
-        if (CanDebug()) {
-            Log.d(TAG, "getAiColor");
-        }
         return mSystemControlManager.GetAiColor();
     }
 
     public int setAiColor(int value, int isSave) {
-        if (CanDebug()) {
-            Log.d(TAG, "setAiColor value: " + value + ", isSave: " + isSave);
-        }
+        logDebug(TAG, false, "setAiColor value: " + value + ", isSave: " + isSave);
         return mSystemControlManager.SetAiColor(value, isSave);
     }
 

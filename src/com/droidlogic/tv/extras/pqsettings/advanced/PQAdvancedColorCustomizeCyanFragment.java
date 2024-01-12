@@ -24,7 +24,6 @@ import androidx.preference.SeekBarPreference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.ListPreference;
 import android.os.SystemProperties;
-import android.util.Log;
 import android.text.TextUtils;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -34,9 +33,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.provider.Settings;
 
-import com.droidlogic.tv.extras.util.DroidUtils;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
-import com.droidlogic.tv.extras.SettingsConstant;
 import com.droidlogic.tv.extras.R;
 
 import com.droidlogic.tv.extras.pqsettings.PQSettingsManager;
@@ -54,10 +52,6 @@ public class PQAdvancedColorCustomizeCyanFragment extends SettingsPreferenceFrag
 
     public static PQAdvancedColorCustomizeCyanFragment newInstance() {
         return new PQAdvancedColorCustomizeCyanFragment();
-    }
-
-    private boolean CanDebug() {
-        return PQSettingsManager.CanDebug();
     }
 
     private String[] getArrayString(int resid) {
@@ -109,7 +103,7 @@ public class PQAdvancedColorCustomizeCyanFragment extends SettingsPreferenceFrag
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        if (CanDebug()) Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
+        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
         return super.onPreferenceTreeClick(preference);
     }
 
@@ -118,15 +112,14 @@ public class PQAdvancedColorCustomizeCyanFragment extends SettingsPreferenceFrag
         switch (preference.getKey()) {
             case PQ_PICTURE_ADVANCED_COLOR_CUSTOMIZE_CYAN_SATURATION:
                 mPQSettingsManager.setAdvancedColorCustomizeCyanSaturationStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_VL_AMOUNT, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_CUSTOMIZE_CYAN_LUMA:
                 mPQSettingsManager.setAdvancedColorCustomizeCyanLumaStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_DE_AMOUNT, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_CUSTOMIZE_CYAN_HUE:
                 mPQSettingsManager.setAdvancedColorCustomizeCyanHueStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_SURROUND_BOOST, (int)newValue);
+                break;
+            default:
                 break;
         }
         return true;

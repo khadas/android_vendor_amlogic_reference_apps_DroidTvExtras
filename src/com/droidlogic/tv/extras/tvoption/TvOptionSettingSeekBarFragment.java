@@ -21,7 +21,6 @@ import android.os.Handler;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import android.os.SystemProperties;
-import android.util.Log;
 import android.text.TextUtils;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;

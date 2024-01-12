@@ -16,29 +16,17 @@
 
 package com.droidlogic.tv.extras.tvoption;
 
-import android.content.ContentResolver;
-import android.content.Context;
-import android.os.Bundle;
-import android.os.SystemProperties;
-import android.provider.Settings;
-import androidx.preference.SwitchPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
-import androidx.preference.SwitchPreferenceCompat;
-import androidx.preference.TwoStatePreference;
-import androidx.preference.PreferenceScreen;
-import androidx.preference.TwoStatePreference;
+import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.List;
 import java.util.ArrayList;
 
-import com.droidlogic.app.OutputModeManager;
-import com.droidlogic.tv.extras.util.DroidUtils;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
-import com.droidlogic.tv.extras.SettingsConstant;
 import com.droidlogic.tv.extras.R;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 public class Hdmi20SwitchFragment extends SettingsPreferenceFragment implements Preference.OnPreferenceChangeListener{
 
@@ -57,15 +45,6 @@ public class Hdmi20SwitchFragment extends SettingsPreferenceFragment implements 
 
     public static Hdmi20SwitchFragment newInstance() {
         return new Hdmi20SwitchFragment();
-    }
-
-    private boolean CanDebug() {
-        return DroidUtils.CanDebug();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -97,7 +76,8 @@ public class Hdmi20SwitchFragment extends SettingsPreferenceFragment implements 
             }
         }
         int no = mTvOptionSettingManager.getNumOfHdmi();
-        Log.d(TAG,"refresh:"+no+",total size:"+getPreferenceScreen().getPreferenceCount());
+        logDebug(TAG, false, "refresh:" + no
+                + ",total size:" + getPreferenceScreen().getPreferenceCount());
         for (int i = no; i < getPreferenceScreen().getPreferenceCount(); i++) {
             getPreferenceScreen().removePreference(all.get(i));
         }
@@ -134,7 +114,8 @@ public class Hdmi20SwitchFragment extends SettingsPreferenceFragment implements 
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if (CanDebug()) Log.d(TAG, "[onPreferenceChange] preference.getKey() = " + preference.getKey() + ", newValue = " + newValue);
+        logDebug(TAG, false, "[onPreferenceChange] preference.getKey() = " + preference.getKey()
+                + ", newValue = " + newValue);
         final int selection = Integer.parseInt((String)newValue);
         if (TextUtils.equals(preference.getKey(), HDMI1_SWITCH)) {
             mTvOptionSettingManager.setHdmi20Mode(HDMI1, selection);

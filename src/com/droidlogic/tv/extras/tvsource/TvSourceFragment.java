@@ -35,7 +35,6 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.TwoStatePreference;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.ListAdapter;
 
 import com.droidlogic.app.DataProviderManager;
@@ -56,8 +55,11 @@ import com.droidlogic.app.tv.ChannelInfo;
 import android.hardware.hdmi.HdmiControlManager;
 import android.hardware.hdmi.HdmiTvClient;
 import android.media.tv.TvInputHardwareInfo;
+
 import java.util.ArrayList;
+
 import com.droidlogic.app.SystemControlManager;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 public class TvSourceFragment extends SettingsPreferenceFragment {
 
@@ -104,7 +106,8 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
 
     // if Fragment has no nullary constructor, it might throw InstantiationException, so add this constructor.
     // For more details, you can visit http://blog.csdn.net/xplee0576/article/details/43057633 .
-    public TvSourceFragment() {}
+    public TvSourceFragment() {
+    }
 
     public TvSourceFragment(Context context) {
         mContext = context;
@@ -137,7 +140,7 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
             intent = getActivity().getIntent();
         }
 
-        if (DEBUG)  Log.d(TAG, "onCreatePreferences  intent= "+ intent);
+        logDebug(TAG, false, "onCreatePreferences  intent= " + intent);
         if (intent != null) {
             mFromTvApp = intent.getIntExtra(DATA_FROM_TV_APP, MODE_GLOBAL) == MODE_LIVE_TV;
             mStartPackage = intent.getStringExtra(DATA_REQUEST_PACKAGE);
@@ -155,7 +158,7 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
                 } else {
                     mPreSource = INPUT_DTV;
                 }
-            } else if (currentInputId.contains(INPUT_AV)){
+            } else if (currentInputId.contains(INPUT_AV)) {
                 mPreSource = INPUT_AV;
             } else if (currentInputId.contains(INPUT_HDMI_LOWER)) {
                 mPreSource = INPUT_HDMI;
@@ -163,7 +166,7 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
         }
 
         String inputId = preference.getKey();
-         if (!TextUtils.isEmpty(inputId) && inputId.contains(INPUT_HDMI_LOWER)) {
+        if (!TextUtils.isEmpty(inputId) && inputId.contains(INPUT_HDMI_LOWER)) {
             mCurSource = INPUT_HDMI;
         } else if (TextUtils.regionMatches(preference.getTitle(), 0, INPUT_AV, 0, 2)) {
             mCurSource = INPUT_AV;
@@ -172,70 +175,71 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
         } else if (TextUtils.regionMatches(preference.getTitle(), 0, INPUT_DTV, 0, 3)) {
             mCurSource = INPUT_DTV;
         }
-        Log.d(TAG, "onPreferenceTreeClick SwitchSourceTime PreSource - CurSource " + mPreSource + "-" + mCurSource);
+        logDebug(TAG, true, "onPreferenceTreeClick SwitchSourceTime PreSource - CurSource " + mPreSource + "-" + mCurSource);
     }
+
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-            calculatePreSrcToCurSrc(preference);
-            float Time= (float) SystemClock.uptimeMillis() / 1000;
-            Log.d(TAG, "onPreferenceTreeClick SwitchSourceTime = " + Time);
-            final Preference sourcePreference = preference;
-            if (sourcePreference.getKey().equals(INPUT_SOURCE_GOOGLE_HOME_KEY)) {
-                Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-                homeIntent.addCategory(Intent.CATEGORY_HOME);
-                homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+        calculatePreSrcToCurSrc(preference);
+        float Time = (float) SystemClock.uptimeMillis() / 1000;
+        logDebug(TAG, true, "onPreferenceTreeClick SwitchSourceTime = " + Time);
+        final Preference sourcePreference = preference;
+        if (sourcePreference.getKey().equals(INPUT_SOURCE_GOOGLE_HOME_KEY)) {
+            Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+            homeIntent.addCategory(Intent.CATEGORY_HOME);
+            homeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
                     | Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-                getPreferenceManager().getContext().startActivity(homeIntent);
-                ((Activity)mContext).finish();
-                return true;
+            getPreferenceManager().getContext().startActivity(homeIntent);
+            ((Activity) mContext).finish();
+            return true;
+        }
+        List<TvInputInfo> inputList = mTvInputManager.getTvInputList();
+        for (TvInputInfo input : inputList) {
+            if (sourcePreference.getKey().equals(input.getId())) {
+                logDebug(TAG, false, "onPreferenceTreeClick:  info=" + input);
+                DroidLogicTvUtils.setCurrentInputId(mContext, input.getId());
+                if (!input.isPassthroughInput()) {
+                    DroidLogicTvUtils.setSearchInputId(mContext, input.getId(), false);
+                    if (TextUtils.equals(sourcePreference.getTitle(), mContext.getResources().getString(R.string.input_atv))) {
+                        DroidLogicTvUtils.setSearchType(mContext, TvScanConfig.TV_SEARCH_TYPE.get(TvScanConfig.TV_SEARCH_TYPE_ATV_INDEX));
+                    } else if (TextUtils.equals(sourcePreference.getTitle(), mContext.getResources().getString(R.string.input_dtv))) {
+                        String country = DroidLogicTvUtils.getCountry(mContext);
+                        ArrayList<String> dtvList = TvScanConfig.GetTvDtvSystemList(country);
+                        DroidLogicTvUtils.setSearchType(mContext, dtvList.get(0));
+                    }
+                }
+
+                Settings.System.putInt(mContext.getContentResolver(), DroidLogicTvUtils.TV_CURRENT_DEVICE_ID,
+                        DroidLogicTvUtils.getHardwareDeviceId(input));
+
+                SystemControlManager mSystemControlManager = SystemControlManager.getInstance();
+                if (DTVKITSOURCE.equals(input.getId())) {//DTVKIT SOURCE
+                    logDebug(TAG, false, "DtvKit source");
+                    mSystemControlManager.SetDtvKitSourceEnable(1);
+                } else {
+                    logDebug(TAG, false, "Not DtvKit source");
+                    mSystemControlManager.SetDtvKitSourceEnable(0);
+                }
+
+                if (mFromTvApp) {
+                    Intent intent = new Intent();
+                    intent.setAction(COMMANDACTION);
+                    intent.putExtra("from_tv_source", true);
+                    intent.putExtra(TvInputInfo.EXTRA_INPUT_ID, input.getId());
+                    getActivity().sendBroadcast(intent);
+                } else {
+                    Intent intent = new Intent(TvInputManager.ACTION_SETUP_INPUTS);
+                    intent.putExtra("from_tv_source", true);
+                    intent.putExtra(TvInputInfo.EXTRA_INPUT_ID, input.getId());
+                    if (mStartPackage != null && mStartPackage.equals("com.droidlogic.mboxlauncher")) {
+                        ((Activity) mContext).setResult(RESULT_OK, intent);
+                    } else {
+                        getPreferenceManager().getContext().startActivity(intent);
+                    }
+                }
+                ((Activity) mContext).finish();
+                break;
             }
-            List<TvInputInfo> inputList = mTvInputManager.getTvInputList();
-            for (TvInputInfo input : inputList) {
-                if (sourcePreference.getKey().equals(input.getId())) {
-                    if (DEBUG) Log.d(TAG, "onPreferenceTreeClick:  info=" + input);
-                    DroidLogicTvUtils.setCurrentInputId(mContext, input.getId());
-                    if (!input.isPassthroughInput()) {
-                        DroidLogicTvUtils.setSearchInputId(mContext, input.getId(), false);
-                        if (TextUtils.equals(sourcePreference.getTitle(), mContext.getResources().getString(R.string.input_atv))) {
-                            DroidLogicTvUtils.setSearchType(mContext, TvScanConfig.TV_SEARCH_TYPE.get(TvScanConfig.TV_SEARCH_TYPE_ATV_INDEX));
-                        } else if (TextUtils.equals(sourcePreference.getTitle(), mContext.getResources().getString(R.string.input_dtv))) {
-                            String country = DroidLogicTvUtils.getCountry(mContext);
-                            ArrayList<String> dtvList = TvScanConfig.GetTvDtvSystemList(country);
-                            DroidLogicTvUtils.setSearchType(mContext, dtvList.get(0));
-                        }
-                    }
-
-                    Settings.System.putInt(mContext.getContentResolver(), DroidLogicTvUtils.TV_CURRENT_DEVICE_ID,
-                            DroidLogicTvUtils.getHardwareDeviceId(input));
-
-                    SystemControlManager mSystemControlManager = SystemControlManager.getInstance();
-                    if (DTVKITSOURCE.equals(input.getId())) {//DTVKIT SOURCE
-                        if (DEBUG) Log.d(TAG, "DtvKit source");
-                        mSystemControlManager.SetDtvKitSourceEnable(1);
-                    } else {
-                        if (DEBUG) Log.d(TAG, "Not DtvKit source");
-                        mSystemControlManager.SetDtvKitSourceEnable(0);
-                    }
-
-                    if (mFromTvApp) {
-                        Intent intent = new Intent();
-                        intent.setAction(COMMANDACTION);
-                        intent.putExtra("from_tv_source", true);
-                        intent.putExtra(TvInputInfo.EXTRA_INPUT_ID, input.getId());
-                        getActivity().sendBroadcast(intent);
-                    } else {
-                        Intent intent = new Intent(TvInputManager.ACTION_SETUP_INPUTS);
-                        intent.putExtra("from_tv_source", true);
-                        intent.putExtra(TvInputInfo.EXTRA_INPUT_ID, input.getId());
-                        if (mStartPackage != null && mStartPackage.equals("com.droidlogic.mboxlauncher")) {
-                            ((Activity)mContext).setResult(RESULT_OK, intent);
-                        } else {
-                            getPreferenceManager().getContext().startActivity(intent);
-                        }
-                    }
-                    ((Activity)mContext).finish();
-                   break;
-               }
         }
         return super.onPreferenceTreeClick(preference);
     }
@@ -247,7 +251,7 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
         screen.setTitle(R.string.tv_source);
         setPreferenceScreen(screen);
 
-        try{
+        try {
             List<TvInputInfo> inputList = mTvInputManager.getTvInputList();
             Collections.sort(inputList, mComparator);
             List<Preference> preferenceList = new ArrayList<Preference>();
@@ -257,8 +261,8 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
             boolean isGTV = themedContext.getPackageManager().hasSystemFeature(AMATI_FEATURE);
             boolean calledByIntent = false;
             if (mContext != null) {
-                Intent intent = ((Activity)mContext).getIntent();
-                Log.d(TAG, "updatePreferenceFragment " + intent);
+                Intent intent = ((Activity) mContext).getIntent();
+                logDebug(TAG, false, "updatePreferenceFragment " + intent);
                 if (intent != null) {
                     if (TextUtils.equals(intent.getAction(), "com.android.tv.action.VIEW_INPUTS")) {
                         calledByIntent = true;
@@ -278,9 +282,9 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
                 preferenceList.add(sourcePreference);
             }
             for (TvInputInfo input : inputList) {
-                Log.d(TAG,"updatePreferenceFragment input " + input + "-->" + input.getType());
+                logDebug(TAG, false, "updatePreferenceFragment input " + input + "-->" + input.getType());
                 if (input.isHidden(themedContext)) {
-                    Log.d(TAG, "updatePreferenceFragment this input hidden");
+                    logDebug(TAG, false, "updatePreferenceFragment this input hidden");
                     continue;
                 }
                 if (input.isPassthroughInput() && input.getParentId() != null) {
@@ -290,7 +294,7 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
                     continue;
                 }
                 if (isGTV && calledByIntent && !input.isHardwareInput()) {
-                    Log.d(TAG, "updatePreferenceFragment, Input switcher don't show " + input);
+                    logDebug(TAG, false, "updatePreferenceFragment, Input switcher don't show " + input);
                     continue;
                 }
                 Preference sourcePreference = new Preference(themedContext);
@@ -304,8 +308,8 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
             for (Preference sourcePreference : preferenceList) {
                 screen.addPreference(sourcePreference);
             }
-        }catch(Exception e){
-            Log.d(TAG, "inputList is "+e);
+        } catch (Exception e) {
+            logDebug(TAG, true, "inputList is " + e.getMessage());
         }
 
     }
@@ -324,7 +328,7 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
             return false;
         }
         if (TextUtils.isEmpty(providerUriString)) {
-            Log.e(TAG, "ContentProvider for basic mode is undefined.");
+            logDebug(TAG, false, "ContentProvider for basic mode is undefined.");
             return false;
         }
         // The string "offline_mode" is a static protocol and should not be changed in general.
@@ -338,7 +342,7 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
                 return "1".equals(basicMode);
             }
         } catch (IllegalArgumentException | NullPointerException e) {
-            Log.e(TAG, "Unable to query the ContentProvider for basic mode.", e);
+            logDebug(TAG, true, "Unable to query the ContentProvider for basic mode.");
             return false;
         }
         return false;
@@ -346,8 +350,8 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
 
     private void addSpecificDtv(Context themedContext, TvInputInfo input, List<Preference> preferenceList) {
         if (DroidLogicTvUtils.isChina(themedContext)
-            && input.getType() == TvInputInfo.TYPE_TUNER
-            && PACKAGE_DROIDLOGIC_TVINPUT.equals(input.getServiceInfo().packageName)) {
+                && input.getType() == TvInputInfo.TYPE_TUNER
+                && PACKAGE_DROIDLOGIC_TVINPUT.equals(input.getServiceInfo().packageName)) {
             Preference sourcePreferenceDtv = new Preference(themedContext);
             sourcePreferenceDtv.setKey(input.getId());
             sourcePreferenceDtv.setPersistent(false);
@@ -369,7 +373,8 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
         } else {
             title = customLabel;
         }
-        Log.d(TAG, "getTitle default " + title + ", label = " + label + ", customLabel = " + customLabel);
+        logDebug(TAG, true, "getTitle default " + title
+                + ", label = " + label + ", customLabel = " + customLabel);
         if (input.isPassthroughInput()) {
             int portId = DroidLogicTvUtils.getPortId(input);
             if (audioSystem != null && audioSystem.getPortId() == portId) {
@@ -387,7 +392,7 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
         } else if (TextUtils.isEmpty(title)) {
             title = input.getServiceInfo().name;
         }
-        Log.d(TAG, "getTitle " + title);
+        logDebug(TAG, true, "getTitle " + title);
         return title;
     }
 
@@ -405,13 +410,13 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
             }
         }
 
-        Log.d(TAG, "getTitleForTuner title " + title + " for package " + packageName);
+        logDebug(TAG, true, "getTitleForTuner title " + title + " for package " + packageName);
         return title;
     }
 
     private List<HdmiDeviceInfo> getHdmiList() {
         if (mTvClient == null) {
-            Log.e(TAG, "mTvClient null!");
+            logDebug(TAG, true, "mTvClient null!");
             return null;
         }
         return mTvClient.getDeviceList();
@@ -422,7 +427,7 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
      */
     private HdmiDeviceInfo getOrigHdmiDeviceByPort(int portId, List<HdmiDeviceInfo> hdmiList) {
         if (hdmiList == null) {
-            Log.d(TAG, "mTvInputManager or mTvClient maybe null");
+            logDebug(TAG, true, "mTvInputManager or mTvClient maybe null");
             return null;
         }
         for (HdmiDeviceInfo info : hdmiList) {
@@ -435,7 +440,7 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
 
     private HdmiDeviceInfo getOrigHdmiDevice(int logicalAddress, List<HdmiDeviceInfo> hdmiList) {
         if (hdmiList == null) {
-            Log.d(TAG, "mTvInputManager or mTvClient maybe null");
+            logDebug(TAG, true, "mTvInputManager or mTvClient maybe null");
             return null;
         }
         for (HdmiDeviceInfo info : hdmiList) {
@@ -449,23 +454,19 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
     private boolean isInputEnabled(TvInputInfo input) {
         HdmiDeviceInfo hdmiInfo = input.getHdmiDeviceInfo();
         if (hdmiInfo != null && !TextUtils.isEmpty(input.getParentId())) {
-            if (DEBUG) Log.d(TAG, "isInputEnabled:  hdmiInfo="+ hdmiInfo);
+            logDebug(TAG, false, "isInputEnabled:  hdmiInfo=" + hdmiInfo);
             return true;
         }
 
         int deviceId = DroidLogicTvUtils.getHardwareDeviceId(input);
-        if (DEBUG) {
-            Log.d(TAG, "===== getHardwareDeviceId:tvInputId = " + input.getId());
-            Log.d(TAG, "===== deviceId : "+ deviceId);
-        }
+        logDebug(TAG, false, "===== getHardwareDeviceId:tvInputId = " + input.getId());
+        logDebug(TAG, false, "===== deviceId : " + deviceId);
         TvControlManager.SourceInput tvSourceInput = DroidLogicTvUtils.parseTvSourceInputFromDeviceId(deviceId);
         int connectStatus = -1;
         if (tvSourceInput != null) {
             connectStatus = mTvControlManager.GetSourceConnectStatus(tvSourceInput);
         } else {
-            if (DEBUG) {
-                Log.w(TAG, "===== cannot find tvSourceInput");
-            }
+            logDebug(TAG, false, "===== cannot find tvSourceInput");
         }
 
         return !input.isPassthroughInput() || 1 == connectStatus || deviceId == DroidLogicTvUtils.DEVICE_ID_SPDIF;
@@ -566,13 +567,13 @@ public class TvSourceFragment extends SettingsPreferenceFragment {
                     return R.drawable.ic_av_disconnected;
                 }
             default:
-                 if (isConnected) {
+                if (isConnected) {
                     return R.drawable.ic_spdif_connected;
                 } else {
                     return R.drawable.ic_spdif_disconnected;
                 }
-         }
-     }
+        }
+    }
 
     @Override
     public int getMetricsCategory() {

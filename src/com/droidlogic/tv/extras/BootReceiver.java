@@ -36,10 +36,6 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (DEBUG) {
-            Log.d(TAG, "onReceive");
-        }
-
         WOL_MODE = TvControlDataManager.getInstance(context).getInt(context.getContentResolver(), SAVE_WOL, 0);
         if (WOL_MODE == 0) {
             boolean a = mSystemControlManager.writeSysFs("/sys/class/ethernet/wol" , "0");

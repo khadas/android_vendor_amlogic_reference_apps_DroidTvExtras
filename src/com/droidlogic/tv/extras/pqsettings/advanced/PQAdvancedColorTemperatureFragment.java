@@ -24,7 +24,6 @@ import androidx.preference.SeekBarPreference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.ListPreference;
 import android.os.SystemProperties;
-import android.util.Log;
 import android.text.TextUtils;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -34,13 +33,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.provider.Settings;
 
-import com.droidlogic.tv.extras.util.DroidUtils;
-import com.droidlogic.tv.extras.SettingsConstant;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.R;
-
 import com.droidlogic.tv.extras.pqsettings.PQSettingsManager;
-
 
 public class PQAdvancedColorTemperatureFragment extends SettingsPreferenceFragment implements Preference.OnPreferenceChangeListener {
     public static final String TAG = "PQAdvancedColorTemperatureFragment";
@@ -59,10 +55,6 @@ public class PQAdvancedColorTemperatureFragment extends SettingsPreferenceFragme
 
     public static PQAdvancedColorTemperatureFragment newInstance() {
         return new PQAdvancedColorTemperatureFragment();
-    }
-
-    private boolean CanDebug() {
-        return PQSettingsManager.CanDebug();
     }
 
     private String[] getArrayString(int resid) {
@@ -147,7 +139,7 @@ public class PQAdvancedColorTemperatureFragment extends SettingsPreferenceFragme
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        if (CanDebug()) Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
+        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
         switch (preference.getKey()) {
             case PQ_PICTURE_ADVANCED_COLOR_TEMPERATURE_WBRESET:
                 Intent PQAdvancedColorTemperatureResetAllIntent = new Intent();
@@ -155,6 +147,8 @@ public class PQAdvancedColorTemperatureFragment extends SettingsPreferenceFragme
                         "com.droidlogic.tv.extras",
                         "com.droidlogic.tv.extras.pqsettings.advanced.PQAdvancedColorTemperatureResetAllActivity");
                 startActivity(PQAdvancedColorTemperatureResetAllIntent);
+                break;
+            default:
                 break;
         }
         return super.onPreferenceTreeClick(preference);
@@ -166,33 +160,26 @@ public class PQAdvancedColorTemperatureFragment extends SettingsPreferenceFragme
             case PQ_PICTURE_ADVANCED_COLOR_TEMPERATURE_WBSETTING:
                 final int selection = Integer.parseInt((String)newValue);
                 mPQSettingsManager.setColorTemperature(selection);
-                //final int progress = Integer.parseInt((String)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_GEQ_ENABLE, progress);
-                //updateGeq(progress);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_TEMPERATURE_RGAIN:
                 mPQSettingsManager.setAdvancedColorTemperatureRGainStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_VL_AMOUNT, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_TEMPERATURE_GGAIN:
                 mPQSettingsManager.setAdvancedColorTemperatureGGainStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_DE_AMOUNT, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_TEMPERATURE_BGAIN:
                 mPQSettingsManager.setAdvancedColorTemperatureBGainStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_SURROUND_BOOST, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_TEMPERATURE_ROFFSET:
                 mPQSettingsManager.setAdvancedColorTemperatureROffsetStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_SURROUND_BOOST, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_TEMPERATURE_GOFFSET:
                 mPQSettingsManager.setAdvancedColorTemperatureGOffsetStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_SURROUND_BOOST, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_TEMPERATURE_BOFFSET:
                 mPQSettingsManager.setAdvancedColorTemperatureBOffsetStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_SURROUND_BOOST, (int)newValue);
+                break;
+            default:
                 break;
         }
         return true;

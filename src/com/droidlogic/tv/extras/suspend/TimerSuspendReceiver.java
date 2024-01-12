@@ -15,13 +15,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.InputEvent;
 import android.view.KeyEvent;
 import com.droidlogic.app.DataProviderManager;
 import com.droidlogic.app.DroidLogicKeyEvent;
-import com.droidlogic.app.SystemControlManager;
 import com.droidlogic.app.tv.DroidLogicTvUtils;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 import java.lang.reflect.Method;
 
@@ -30,17 +29,15 @@ public class TimerSuspendReceiver extends BroadcastReceiver {
     private static final int INJECT_INPUT_EVENT_MODE_WAIT_FOR_FINISH = 2;
 
     private Context mContext = null;
-    private SystemControlManager mSystemControlManager = null;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d(TAG, "onReceive: " + intent);
 
         mContext = context;
         if (intent != null) {
             if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
                 // once new boot, clear sleep time
-                Log.i(TAG, "Clear SleepTime");
+                logDebug(TAG, false, "Clear SleepTime");
                 DataProviderManager.putIntValue(mContext, DroidLogicTvUtils.PROP_DROID_TV_SLEEP_TIME, 0);
                 Intent intentService = new Intent(mContext, TimerSuspendService.class );
                 mContext.startService(intentService);
@@ -51,7 +48,6 @@ public class TimerSuspendReceiver extends BroadcastReceiver {
             if (intent.getBooleanExtra(DroidLogicTvUtils.KEY_COMMAND_REQUEST_SUSPEND, false)) {
                 pressPowerKey();
             } else {
-                mSystemControlManager = SystemControlManager.getInstance();
                 if (intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, false)) {
                     DataProviderManager.putIntValue(mContext, DroidLogicTvUtils.PROP_DROID_TV_SLEEP_TIME, 0);//clear it as acted
                 }
@@ -61,7 +57,6 @@ public class TimerSuspendReceiver extends BroadcastReceiver {
     }
 
     public void startSleepTimer (Intent intent) {
-        Log.d(TAG, "startSleepTimer");
         Intent intentService = new Intent(mContext, TimerSuspendService.class );
         intentService.putExtra(DroidLogicTvUtils.KEY_ENABLE_NOSIGNAL_TIMEOUT, intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_NOSIGNAL_TIMEOUT, false));
         intentService.putExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, intent.getBooleanExtra(DroidLogicTvUtils.KEY_ENABLE_SUSPEND_TIMEOUT, false));
@@ -70,7 +65,7 @@ public class TimerSuspendReceiver extends BroadcastReceiver {
 
     private void pressPowerKey () {
         if (!isSystemScreenOn()) {
-            Log.d(TAG, "pressPowerKey screen is off already");
+            logDebug(TAG, false, "pressPowerKey screen is off already");
             return;
         }
         long now = SystemClock.uptimeMillis();
@@ -83,7 +78,7 @@ public class TimerSuspendReceiver extends BroadcastReceiver {
     private boolean isSystemScreenOn() {
         PowerManager powerManager = mContext.getSystemService(PowerManager.class);
         boolean isScreenOpen = powerManager.isScreenOn();
-        Log.d(TAG, "isSystemScreenOn isScreenOpen = " + isScreenOpen);
+        logDebug(TAG, false, "isSystemScreenOn isScreenOpen = " + isScreenOpen);
         return isScreenOpen;
     }
 
@@ -94,7 +89,7 @@ public class TimerSuspendReceiver extends BroadcastReceiver {
             Method method = cls.getMethod("injectInputEvent", InputEvent.class, int.class);
             method.invoke(constructor.invoke(null), keyevent, mode);
         } catch(Exception e) {
-            Log.d(TAG, "getInjectInputEvent Exception = " + e.getMessage());
+            logDebug(TAG, true, "getInjectInputEvent Exception = " + e.getMessage());
         }
     }
 }

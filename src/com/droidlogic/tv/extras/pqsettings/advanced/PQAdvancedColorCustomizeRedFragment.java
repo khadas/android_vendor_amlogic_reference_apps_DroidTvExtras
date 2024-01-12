@@ -24,7 +24,6 @@ import androidx.preference.SeekBarPreference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.ListPreference;
 import android.os.SystemProperties;
-import android.util.Log;
 import android.text.TextUtils;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -34,8 +33,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.provider.Settings;
 
-import com.droidlogic.tv.extras.util.DroidUtils;
-import com.droidlogic.tv.extras.SettingsConstant;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.R;
 
@@ -54,10 +52,6 @@ public class PQAdvancedColorCustomizeRedFragment extends SettingsPreferenceFragm
 
     public static PQAdvancedColorCustomizeRedFragment newInstance() {
         return new PQAdvancedColorCustomizeRedFragment();
-    }
-
-    private boolean CanDebug() {
-        return PQSettingsManager.CanDebug();
     }
 
     private String[] getArrayString(int resid) {
@@ -109,7 +103,7 @@ public class PQAdvancedColorCustomizeRedFragment extends SettingsPreferenceFragm
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        if (CanDebug()) Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
+        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
         return super.onPreferenceTreeClick(preference);
     }
 
@@ -118,15 +112,14 @@ public class PQAdvancedColorCustomizeRedFragment extends SettingsPreferenceFragm
         switch (preference.getKey()) {
             case PQ_PICTURE_ADVANCED_COLOR_CUSTOMIZE_RED_SATURATION:
                 mPQSettingsManager.setAdvancedColorCustomizeRedSaturationStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_VL_AMOUNT, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_CUSTOMIZE_RED_LUMA:
                 mPQSettingsManager.setAdvancedColorCustomizeRedLumaStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_DE_AMOUNT, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_CUSTOMIZE_RED_HUE:
                 mPQSettingsManager.setAdvancedColorCustomizeRedHueStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_SURROUND_BOOST, (int)newValue);
+                break;
+            default:
                 break;
         }
         return true;

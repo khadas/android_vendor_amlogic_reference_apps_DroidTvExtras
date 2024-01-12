@@ -43,9 +43,7 @@ import com.droidlogic.tv.extras.SettingsConstant;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.MainFragment;
 import com.droidlogic.tv.extras.R;
-import com.droidlogic.tv.extras.SettingsConstant;
-
-import static com.droidlogic.tv.extras.util.DroidUtils.CanDebug;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -178,7 +176,6 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
         final View innerView = super.onCreateView(inflater, container, savedInstanceState);
         if (getActivity().getIntent().getIntExtra("from_live_tv", 0) == 1) {
             //MainFragment.changeToLiveTvStyle(innerView, getActivity());
@@ -188,7 +185,6 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        Log.d(TAG, "onCreatePreferences");
         setPreferencesFromResource(R.xml.pq_picture_mode, null);
         if (mPQSettingsManager == null) {
             mPQSettingsManager = new PQSettingsManager(getActivity());
@@ -212,7 +208,8 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
             mPicturemodePref.setEntryValues(setHdmiPicEntryValues());
         }
 
-        Log.d(TAG, "curPictureMode:" + curPictureMode + " isTv:" + isTv + " isLiveTv:" + is_from_live_tv);
+        logDebug(TAG, true, "curPictureMode:" + curPictureMode
+                + " isTv:" + isTv + " isLiveTv:" + is_from_live_tv);
         setPicturMode(isTv, curPictureMode);
 
         final Preference pictureCustomerPref = (Preference) findPreference(PQ_CUSTOM);
@@ -256,9 +253,7 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        if (CanDebug()) {
-            Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
-        }
+        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
         switch (preference.getKey()) {
             case PQ_PICTURE_MODE_SDR:
                 if (mPQSettingsManager.STATUS_GAME.equals( mPQSettingsManager.getPictureModeStatus())
@@ -290,7 +285,8 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        Log.d(TAG, "[onPreferenceChange] preference.getKey() = " + preference.getKey() + ", newValue = " + newValue);
+        logDebug(TAG, false, "[onPreferenceChange] preference.getKey() = " + preference.getKey()
+                + ", newValue = " + newValue);
         getCurrentSource();
         if (FLAG_PQ_PICTURE_MODE &&
             TextUtils.equals(preference.getKey(), PQ_PICTURE_MODE)) {
@@ -382,7 +378,7 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
         if (inputId != null && inputId.startsWith(DTVKIT_PACKAGE)) {
             result = true;
         }
-        Log.d(TAG, "isDtvKitInput result = " + result);
+        logDebug(TAG, false, "isDtvKitInput result = " + result);
         return result;
     }
 
@@ -482,7 +478,7 @@ public class PictureModeFragment extends SettingsPreferenceFragment implements P
     private void getCurrentSource() {
         ////Use the interface to get the current source
         int currentPictureModeSource = mPQSettingsManager.getPictureModeSource();
-        if (CanDebug()) Log.d(TAG, "currentPictureModeSource: " + currentPictureModeSource);
+        logDebug(TAG, false, "currentPictureModeSource: " + currentPictureModeSource);
         if (currentPictureModeSource == Current_Source_Type.PQ_PICTURE_MODE_SDR.toInt()) {
             FLAG_PQ_PICTURE_MODE_SDR = true;
             FLAG_PQ_PICTURE_MODE_HDR10= false;

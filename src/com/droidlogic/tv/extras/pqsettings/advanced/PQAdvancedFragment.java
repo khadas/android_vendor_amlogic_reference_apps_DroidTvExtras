@@ -26,7 +26,6 @@ import androidx.preference.TwoStatePreference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.Preference.OnPreferenceChangeListener;
 import android.util.ArrayMap;
-import android.util.Log;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -40,6 +39,7 @@ import com.droidlogic.app.SystemControlManager;
 import com.droidlogic.tv.extras.R;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.pqsettings.PQSettingsManager;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 public class PQAdvancedFragment extends SettingsPreferenceFragment implements Preference.OnPreferenceChangeListener {
     private static final String TAG = "PQAdvancedFragment";
@@ -217,7 +217,7 @@ public class PQAdvancedFragment extends SettingsPreferenceFragment implements Pr
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if (CanDebug()) Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
+        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
         // Because the type of "PQ_PICTURE_ADVANCED_DARK_DETAIL" is inconsistent with the other preferences,
         // the processing logic is separated separately
         if (TextUtils.equals(preference.getKey(), PQ_PICTURE_ADVANCED_DARK_DETAIL)) {

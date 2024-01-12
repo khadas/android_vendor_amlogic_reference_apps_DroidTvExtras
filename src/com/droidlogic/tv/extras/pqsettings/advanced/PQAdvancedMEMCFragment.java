@@ -23,13 +23,12 @@ import androidx.preference.PreferenceScreen;
 import androidx.preference.TwoStatePreference;
 import androidx.preference.PreferenceCategory;
 import android.util.ArrayMap;
-import android.util.Log;
 import android.text.TextUtils;
 
-import com.droidlogic.app.DisplayPositionManager;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.R;
 import com.droidlogic.tv.extras.pqsettings.PQSettingsManager;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 import java.util.List;
 import java.util.Map;
@@ -53,13 +52,8 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
 
     private PQSettingsManager mPQSettingsManager;
 
-
     public static PQAdvancedMEMCFragment newInstance() {
         return new PQAdvancedMEMCFragment();
-    }
-
-    public static boolean CanDebug() {
-        return PQSettingsManager.CanDebug();
     }
 
     @Override
@@ -83,7 +77,7 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
         mSystemControlManager = SystemControlManager.getInstance();
 
         hasMemc = mSystemControlManager.hasMemcFunc();
-        if (hasMemc) {//Leave blank first, add conditions later
+        if (hasMemc) {
             pictureAdvancedMemcSwitchPref.setVisible(true);
             pictureAdvancedMemcSwitchPref.setValueIndex(mPQSettingsManager.getAdvancedMemcSwitchStatus());
             pictureAdvancedMemcSwitchPref.setOnPreferenceChangeListener(this);
@@ -91,7 +85,7 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
             pictureAdvancedMemcSwitchPref.setVisible(false);
         }
 
-        if (hasMemc) {//Leave blank first, add conditions later
+        if (hasMemc) {
             PQPictureAdvancedMemcCustomizeDejudderPref.setOnPreferenceChangeListener(this);
             PQPictureAdvancedMemcCustomizeDejudderPref.setSeekBarIncrement(PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_STEP);
             PQPictureAdvancedMemcCustomizeDejudderPref.setMin(0);
@@ -102,7 +96,7 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
             PQPictureAdvancedMemcCustomizeDejudderPref.setVisible(false);
         }
 
-        if (hasMemc) {//Leave blank first, add conditions later
+        if (hasMemc) {
             PQPictureAdvancedMemcCustomizeDeblurPref.setOnPreferenceChangeListener(this);
             PQPictureAdvancedMemcCustomizeDeblurPref.setSeekBarIncrement(PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_STEP);
             PQPictureAdvancedMemcCustomizeDeblurPref.setMin(0);
@@ -124,7 +118,7 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey()+" newValue:"+newValue);
+        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey()+" newValue:"+newValue);
         switch (preference.getKey()) {
             case PQ_PICTURE_ADVANCED_MEMC_SWITCH:
                 final int selection = Integer.parseInt((String)newValue);
@@ -136,6 +130,8 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
                 break;
             case PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_DEBLUR:
                 mPQSettingsManager.setAdvancedMemcCustomizeDeblurStatus((int)newValue);
+                break;
+            default:
                 break;
         }
         return true;

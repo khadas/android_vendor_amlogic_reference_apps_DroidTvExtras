@@ -24,7 +24,6 @@ import androidx.preference.SeekBarPreference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.ListPreference;
 import android.os.SystemProperties;
-import android.util.Log;
 import android.text.TextUtils;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -38,7 +37,7 @@ import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.R;
 
 import com.droidlogic.tv.extras.pqsettings.PQSettingsManager;
-
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 public class PQAdvancedManualGammaFragment extends SettingsPreferenceFragment implements Preference.OnPreferenceChangeListener {
     public static final String TAG = "PQAdvancedManualGammaFragment";
@@ -54,10 +53,6 @@ public class PQAdvancedManualGammaFragment extends SettingsPreferenceFragment im
 
     public static PQAdvancedManualGammaFragment newInstance() {
         return new PQAdvancedManualGammaFragment();
-    }
-
-    private boolean CanDebug() {
-        return PQSettingsManager.CanDebug();
     }
 
     private String[] getArrayString(int resid) {
@@ -118,7 +113,7 @@ public class PQAdvancedManualGammaFragment extends SettingsPreferenceFragment im
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        if (CanDebug()) Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
+        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
         switch (preference.getKey()) {
             case PQ_PICTURE_ADVANCED_MANUAL_GAMMA_RESET:
                 Intent PQPictureAdvancedManualGammaResetAllIntent = new Intent();
@@ -136,21 +131,17 @@ public class PQAdvancedManualGammaFragment extends SettingsPreferenceFragment im
         switch (preference.getKey()) {
             case PQ_PICTURE_ADVANCED_MANUAL_GAMMA_LEVEL:
                 mPQSettingsManager.setAdvancedManualGammaLevelStatus((int)newValue);
-                //final int progress = Integer.parseInt((String)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_GEQ_ENABLE, progress);
-                //updateGeq(progress);
                 break;
             case PQ_PICTURE_ADVANCED_MANUAL_GAMMA_RGAIN:
                 mPQSettingsManager.setAdvancedManualGammaRGainStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_VL_AMOUNT, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_MANUAL_GAMMA_GGAIN:
                 mPQSettingsManager.setAdvancedManualGammaGGainStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_DE_AMOUNT, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_MANUAL_GAMMA_BGAIN:
                 mPQSettingsManager.setAdvancedManualGammaBGainStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_SURROUND_BOOST, (int)newValue);
+                break;
+            default:
                 break;
         }
         return true;

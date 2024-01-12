@@ -25,7 +25,6 @@ import androidx.preference.PreferenceScreen;
 import androidx.preference.TwoStatePreference;
 import androidx.preference.PreferenceCategory;
 import android.util.ArrayMap;
-import android.util.Log;
 import android.text.TextUtils;
 
 import com.droidlogic.app.DisplayPositionManager;
@@ -33,6 +32,7 @@ import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.R;
 import com.droidlogic.tv.extras.SettingsConstant;
 import com.droidlogic.tv.extras.pqsettings.PQSettingsManager;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 import java.util.List;
 import java.util.Map;
@@ -50,12 +50,11 @@ public class PQAdvancedColorCustomizeFragment extends SettingsPreferenceFragment
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         boolean isTv = SettingsConstant.needDroidlogicTvFeature(getActivity());
         setPreferencesFromResource(R.xml.pq_picture_advanced_color_customize, null);
-        updateMainScreen();
     }
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        if (CanDebug()) Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
+        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
         switch (preference.getKey()) {
             case PQ_ADVANCED_COLOR_CUSTOMIZE_ALLRESET:
                 Intent PQAdvancedColorCustomizeResetAllResetIntent = new Intent();
@@ -64,6 +63,8 @@ public class PQAdvancedColorCustomizeFragment extends SettingsPreferenceFragment
                         "com.droidlogic.tv.settings.pqsettings.advanced.PQAdvancedColorCustomizeResetAllActivity");
                 startActivity(PQAdvancedColorCustomizeResetAllResetIntent);
                 break;
+            default:
+                break;
         }
         return super.onPreferenceTreeClick(preference);
     }
@@ -71,14 +72,6 @@ public class PQAdvancedColorCustomizeFragment extends SettingsPreferenceFragment
     @Override
     public int getMetricsCategory() {
         return 0;
-    }
-
-    private void updateMainScreen() {
-
-    }
-
-    private boolean CanDebug() {
-        return PQSettingsManager.CanDebug();
     }
 
 }

@@ -21,7 +21,6 @@ import android.os.Handler;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import android.os.SystemProperties;
-import android.util.Log;
 import android.text.TextUtils;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -32,7 +31,6 @@ import android.widget.TextView;
 import android.provider.Settings;
 
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
-import com.droidlogic.tv.extras.util.DroidUtils;
 import com.droidlogic.tv.extras.SettingsConstant;
 import com.droidlogic.tv.extras.R;
 

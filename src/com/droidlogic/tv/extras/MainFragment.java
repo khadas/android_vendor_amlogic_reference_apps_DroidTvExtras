@@ -21,13 +21,12 @@ import androidx.preference.TwoStatePreference;
 
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Log;
 import android.os.Bundle;
 
 import com.droidlogic.app.tv.TvControlManager;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.SettingsConstant;
-import com.droidlogic.tv.extras.util.DroidUtils;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 import com.droidlogic.tv.extras.R;
 
 public class MainFragment extends SettingsPreferenceFragment implements
@@ -59,9 +58,8 @@ public class MainFragment extends SettingsPreferenceFragment implements
             deviceDlgPref.setOnPreferenceChangeListener(this);
             deviceDlgPref.setVisible(mTvControlManager.IsSupportDLG());
             int dlgState = mTvControlManager.GetDLGEnable();
-            if (DroidUtils.CanDebug()) {
-                Log.d(TAG, "GetDLGEnable: " + dlgState);
-            }
+            logDebug(TAG, false, "GetDLGEnable: " + dlgState);
+
             deviceDlgPref.setChecked(dlgState == 1 ? true : false);
         }
         if (!SettingsConstant.needGTVFeature(getContext())) {

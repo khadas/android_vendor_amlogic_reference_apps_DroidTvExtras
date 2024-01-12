@@ -4,7 +4,6 @@ package com.droidlogic.tv.extras.tvsource.sliceprovider;
 
 import android.os.Handler;
 import android.net.Uri;
-import android.util.Log;
 import android.media.tv.TvInputInfo;
 import android.hardware.hdmi.HdmiDeviceInfo;
 import android.content.Context;
@@ -21,6 +20,7 @@ import com.droidlogic.tv.extras.R;
 import com.droidlogic.tv.extras.tvsource.sliceprovider.broadcastreceiver.TvInputSliceBroadcastReceiver;
 import com.droidlogic.tv.extras.tvsource.sliceprovider.manager.TvInputContentManager;
 import com.droidlogic.tv.extras.tvsource.sliceprovider.utils.MediaSliceUtil;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 import java.util.List;
 
@@ -43,7 +43,7 @@ public class TvInputSliceProvider extends MediaSliceProvider {
 
     @Override
     public Slice onBindSlice(Uri sliceUri) {
-        Log.d(TAG, "onBindSlice: " + sliceUri);
+        logDebug(TAG, false, "onBindSlice: " + sliceUri);
         switch (MediaSliceUtil.getFirstSegment(sliceUri)) {
             case MediaSliceConstants.CHANNELS_AND_INPUTS_PATH:
                 return createChannelsAndInputsSlice(sliceUri);
@@ -69,12 +69,12 @@ public class TvInputSliceProvider extends MediaSliceProvider {
                                 .getTvInputContentManager(context);
                         context.getContentResolver().notifyChange(sliceUri, null);
                     });
-            Log.d(TAG, "createChannelsAndInputsSlice: notify change!");
+            logDebug(TAG, true, "createChannelsAndInputsSlice: notify change!");
             return psb.build();
         }
 
         if (mTvInputContentManager.getInputSourceSupportList() == null) {
-            Log.d(TAG, "Hide Channels & Inputs!");
+            logDebug(TAG, true, "Hide Channels & Inputs!");
             psb.addPreference(
                     new RowBuilder()
                             .setTitle("No Signal Source")
@@ -102,12 +102,12 @@ public class TvInputSliceProvider extends MediaSliceProvider {
                 LOGICAL_ADDRESS_AUDIO_SYSTEM, hdmiList);
         String currentInputSource = mTvInputContentManager.getCurrentInputSource();
 
-        Log.d(TAG, "inputSourceList: " + inputSourceSupportList);
-        Log.d(TAG, "currentInputSource: " + currentInputSource);
+        logDebug(TAG, true, "inputSourceList: " + inputSourceSupportList);
+        logDebug(TAG, true, "currentInputSource: " + currentInputSource);
 
         updateInputGoogleTvHome(psb, currentInputSource); // add Google Tv home source
         for (TvInputInfo input : inputSourceSupportList) {
-            Log.d(TAG, "updateChannelsAndInputsDetails: inputId = " + input.getId());
+            logDebug(TAG, false, "updateChannelsAndInputsDetails: inputId = " + input.getId());
             psb.addPreference(
                 new RowBuilder()
                     .setKey(input.getId())
@@ -151,7 +151,7 @@ public class TvInputSliceProvider extends MediaSliceProvider {
             return false;
         }
         if (TextUtils.isEmpty(providerUriString)) {
-            Log.e(TAG, "ContentProvider for basic mode is undefined.");
+            logDebug(TAG, true, "ContentProvider for basic mode is undefined.");
             return false;
         }
         // The string "offline_mode" is a static protocol and should not be changed in general.
@@ -165,7 +165,7 @@ public class TvInputSliceProvider extends MediaSliceProvider {
                 return "1".equals(basicMode);
             }
         } catch (IllegalArgumentException | NullPointerException e) {
-            Log.e(TAG, "Unable to query the ContentProvider for basic mode.", e);
+            logDebug(TAG, true, "Unable to query the ContentProvider for basic mode.");
             return false;
         }
         return false;

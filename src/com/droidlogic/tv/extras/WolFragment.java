@@ -20,17 +20,17 @@ import android.content.Context;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Log;
+import android.net.ConnectivityManager;
+import android.widget.Toast;
+import android.net.NetworkInfo;
 
 import androidx.preference.Preference;
 import androidx.preference.TwoStatePreference;
 
 import com.droidlogic.app.SystemControlManager;
-
-import android.net.ConnectivityManager;
-import android.widget.Toast;
-import android.net.NetworkInfo;
 import com.droidlogic.app.tv.TvControlDataManager;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
+
 
 public class WolFragment extends SettingsPreferenceFragment implements Preference.OnPreferenceChangeListener {
     private static final String TAG = "WolFragment";
@@ -55,16 +55,8 @@ public class WolFragment extends SettingsPreferenceFragment implements Preferenc
 
     @Override
     public void onAttach(Context context) {
-        Log.d(TAG, "onAttach");
         super.onAttach(context);
         mContext = context;
-
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
     }
 
     @Override
@@ -73,41 +65,17 @@ public class WolFragment extends SettingsPreferenceFragment implements Preferenc
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "onActivityCreated");
-
-    }
-
-    @Override
-    public void onStart() {
-        Log.d(TAG, "onStart");
-        super.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onStop() {
-        Log.d(TAG, "onStop");
-        super.onStop();
-    }
-
-    @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.wake_on_lan, null);
         mSystemControlManager = SystemControlManager.getInstance();
         enableWolPref = (TwoStatePreference) findPreference(KEY_ENABLE_WOL);
-        Log.d(TAG, "enableWolPref :" + enableWolPref);
+        logDebug(TAG, false, "enableWolPref :" + enableWolPref);
         enableWolPref.setOnPreferenceChangeListener(this);
         WOL_MODE = TvControlDataManager.getInstance(mContext).getInt(mContext.getContentResolver(), SAVE_WOL, 0);
         if (WOL_MODE == 1) {
             enableWolPref.setChecked(true);
         }
-        Log.d(TAG, "WOL_MODE :" + WOL_MODE);
+        logDebug(TAG, false, "WOL_MODE :" + WOL_MODE);
         if (getWolEnabled()) {
             enableWolPref.setEnabled(true);
         }else{
@@ -118,7 +86,7 @@ public class WolFragment extends SettingsPreferenceFragment implements Preferenc
             //Settings.System.putInt(getActivity().getContentResolver(), SAVE_WOL, WOL_DISABLE);
             mDevHitToast = Toast.makeText(getActivity(), R.string.show_ethernet_request, Toast.LENGTH_LONG);
             mDevHitToast.show();
-            Log.d(TAG, "no ethernet");
+            logDebug(TAG, false, "no ethernet");
         }
         //enableWolPref.setChecked(getWolEnabled());
         //mTvControlDataProvider.insert(SAVE_WOL , WOL_DISABLE);
@@ -126,22 +94,12 @@ public class WolFragment extends SettingsPreferenceFragment implements Preferenc
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if ((boolean) newValue) {
-            enableWolPref.setEnabled(true);
-            enableWolPref.setChecked(true);
-            setWolEnabled(true);
-            TvControlDataManager.getInstance(mContext).putInt(mContext.getContentResolver(), SAVE_WOL, WOL_ENABLE);
-            WOL_MODE = 1;
-            Log.d(TAG, "WOL_MODE :" + WOL_MODE);
-            //Settings.System.putInt(getActivity().getContentResolver(), SAVE_WOL, WOL_ENABLE);
-            //mTvControlDataProvider.update(SAVE_WOL , WOL_DISABLE , WOL_DISABLE);
-        }else{
-            setWolEnabled(false);
-            TvControlDataManager.getInstance(mContext).putInt(mContext.getContentResolver(), SAVE_WOL, WOL_DISABLE);
-            WOL_MODE = 0;
-            Log.d(TAG, "WOL_MODE :" + WOL_MODE);
-            //Settings.System.putInt(getActivity().getContentResolver(), SAVE_WOL, WOL_DISABLE);
-        }
+        boolean keyValue = (boolean) newValue;
+        WOL_MODE = keyValue ? 1 : 0;
+        setWolEnabled(keyValue);
+        TvControlDataManager.getInstance(mContext).putInt(
+                mContext.getContentResolver(), SAVE_WOL, keyValue ? WOL_ENABLE : WOL_DISABLE);
+        logDebug(TAG, false, "WOL_MODE :" + WOL_MODE);
         return true;
     }
 
@@ -157,13 +115,7 @@ public class WolFragment extends SettingsPreferenceFragment implements Preferenc
     }
 
     private void setWolEnabled(boolean enable) {
-        if (enable == true) {
-            boolean a = mSystemControlManager.writeSysFs("/sys/class/ethernet/wol" , "1");
-            Log.d(TAG, "echo 1 > /sys/class/ethernet/wol");
-        }else{
-            boolean a = mSystemControlManager.writeSysFs("/sys/class/ethernet/wol" , "0");
-            Log.d(TAG, "echo 0 > /sys/class/ethernet/wol");
-        }
+        mSystemControlManager.writeSysFs("/sys/class/ethernet/wol", enable ? "1" : "0");
     }
     private static boolean isEthernetConnected() {
         return mNetworkType == ConnectivityManager.TYPE_ETHERNET;

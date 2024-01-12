@@ -23,11 +23,8 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceScreen;
 import androidx.preference.TwoStatePreference;
 import androidx.preference.PreferenceCategory;
-import android.util.ArrayMap;
-import android.util.Log;
 import android.text.TextUtils;
 
-import com.droidlogic.app.DisplayPositionManager;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.R;
 import com.droidlogic.tv.extras.SettingsConstant;
@@ -179,6 +176,8 @@ public class PictureCustomSettingsFragment extends SettingsPreferenceFragment {
                 break;
             case PQ_HUE_OUT:
                 mPQSettingsManager.setTone(ZOOM_OUT_STEP);
+                break;
+            default:
                 break;
         }
         updateMainScreen();

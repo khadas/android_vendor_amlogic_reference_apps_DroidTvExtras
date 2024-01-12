@@ -24,7 +24,6 @@ import androidx.preference.SeekBarPreference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.ListPreference;
 import android.os.SystemProperties;
-import android.util.Log;
 import android.text.TextUtils;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -34,13 +33,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.provider.Settings;
 
-import com.droidlogic.tv.extras.util.DroidUtils;
-import com.droidlogic.tv.extras.SettingsConstant;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.R;
-
 import com.droidlogic.tv.extras.pqsettings.PQSettingsManager;
-
 
 public class PQAdvancedColorCustomizeYellowFragment extends SettingsPreferenceFragment implements Preference.OnPreferenceChangeListener {
     public static final String TAG = "PQAdvancedColorCustomizeYellowFragment";
@@ -54,10 +50,6 @@ public class PQAdvancedColorCustomizeYellowFragment extends SettingsPreferenceFr
 
     public static PQAdvancedColorCustomizeYellowFragment newInstance() {
         return new PQAdvancedColorCustomizeYellowFragment();
-    }
-
-    private boolean CanDebug() {
-        return PQSettingsManager.CanDebug();
     }
 
     private String[] getArrayString(int resid) {
@@ -109,7 +101,7 @@ public class PQAdvancedColorCustomizeYellowFragment extends SettingsPreferenceFr
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        if (CanDebug()) Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
+        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
         return super.onPreferenceTreeClick(preference);
     }
 
@@ -118,15 +110,14 @@ public class PQAdvancedColorCustomizeYellowFragment extends SettingsPreferenceFr
         switch (preference.getKey()) {
             case PQ_PICTURE_ADVANCED_COLOR_CUSTOMIZE_YELLOW_SATURATION:
                 mPQSettingsManager.setAdvancedColorCustomizeYellowSaturationStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_VL_AMOUNT, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_CUSTOMIZE_YELLOW_LUMA:
                 mPQSettingsManager.setAdvancedColorCustomizeYellowLumaStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_DE_AMOUNT, (int)newValue);
                 break;
             case PQ_PICTURE_ADVANCED_COLOR_CUSTOMIZE_YELLOW_HUE:
                 mPQSettingsManager.setAdvancedColorCustomizeYellowHueStatus((int)newValue);
-                //mAudioEffectManager.setDapParam(AudioEffectManager.CMD_DAP_SURROUND_BOOST, (int)newValue);
+                break;
+            default:
                 break;
         }
         return true;

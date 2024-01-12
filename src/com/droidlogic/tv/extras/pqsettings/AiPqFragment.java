@@ -27,6 +27,7 @@ import androidx.preference.TwoStatePreference;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.R;
 import com.droidlogic.app.SystemControlManager;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 /**
  * @author Amlogic
@@ -94,7 +95,7 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
 
         mEnableAipqInfoPref = (TwoStatePreference) findPreference(KEY_ENABLE_AIPQ_INFO);
         mEnableAipqInfoPref.setOnPreferenceChangeListener(this);
-        Log.i(TAG, "init Aipqinfo: " + mPQSettingsManager.getAipqInfo(PROP_AIPQ_ENABLE));
+        logDebug(TAG, false, "init Aipqinfo: " + mPQSettingsManager.getAipqInfo(PROP_AIPQ_ENABLE));
         mEnableAipqInfoPref.setChecked(mPQSettingsManager.getAipqInfo(PROP_AIPQ_ENABLE));
 
         mEnableAiColorPref = (TwoStatePreference) findPreference(KEY_ENABLE_AI_COLOR);
@@ -104,7 +105,8 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        Log.d(TAG, "[onPreferenceChange] preference.getKey() = " + preference.getKey() + ", newValue = " + newValue);
+        logDebug(TAG, false, "[onPreferenceChange] preference.getKey() = " + preference.getKey()
+                + ", newValue = " + newValue);
         if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AIPQ)) {
             if ((boolean) newValue) {
                 mEnableAipqInfoPref.setEnabled(true);

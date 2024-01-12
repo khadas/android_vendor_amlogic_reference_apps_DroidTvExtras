@@ -16,8 +16,6 @@
 
 package com.droidlogic.tv.extras.tvoption;
 
-import android.content.ContentResolver;
-import android.content.Context;
 import android.os.Bundle;
 import android.os.SystemProperties;
 import android.provider.Settings;
@@ -28,18 +26,17 @@ import androidx.preference.SwitchPreferenceCompat;
 import androidx.preference.TwoStatePreference;
 import androidx.preference.PreferenceScreen;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.List;
 import java.util.ArrayList;
 
 import com.droidlogic.app.OutputModeManager;
-import com.droidlogic.tv.extras.util.DroidUtils;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
-import com.droidlogic.tv.extras.SettingsConstant;
 import com.droidlogic.tv.extras.R;
 
-public class NoSignalScreenStatusFragment extends SettingsPreferenceFragment implements Preference.OnPreferenceChangeListener{
+public class NoSignalScreenStatusFragment extends SettingsPreferenceFragment
+        implements Preference.OnPreferenceChangeListener{
 
     private static final String TAG = "NoSignalScreenStatusFragment";
 
@@ -55,25 +52,8 @@ public class NoSignalScreenStatusFragment extends SettingsPreferenceFragment imp
         return new NoSignalScreenStatusFragment();
     }
 
-    private boolean CanDebug() {
-        return DroidUtils.CanDebug();
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
-        if (CanDebug()) {
-            Log.d(TAG, "[onCreatePreferences]");
-        }
         setPreferencesFromResource(R.xml.tv_nosignal_screen_status, null);
         if (mTvOptionSettingManager == null) {
             mTvOptionSettingManager = new TvOptionSettingManager(getActivity(), false);
@@ -86,17 +66,14 @@ public class NoSignalScreenStatusFragment extends SettingsPreferenceFragment imp
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if (CanDebug()) {
-            Log.d(TAG, "[onPreferenceChange] preference.getKey() = " + preference.getKey() + ", newValue = " + newValue);
-        }
+        logDebug(TAG, false, "[onPreferenceChange] preference.getKey() = " + preference.getKey()
+                + ", newValue = " + newValue);
         return true;
     }
 
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        if (CanDebug()) {
-            Log.d(TAG, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
-        }
+        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey());
         boolean isChecked;
         switch (preference.getKey()) {
             case STATIC_FRAME:
@@ -113,6 +90,8 @@ public class NoSignalScreenStatusFragment extends SettingsPreferenceFragment imp
                 mTvOptionSettingManager.setScreenColorForSignalChange(isChecked?1:0, 1);
                 updateScreenColorStatus(isChecked);
                 break;
+            default:
+                break;
         }
         return super.onPreferenceTreeClick(preference);
     }
@@ -123,9 +102,6 @@ public class NoSignalScreenStatusFragment extends SettingsPreferenceFragment imp
     }
 
     private void update() {
-        if (CanDebug()) {
-            Log.d(TAG, "[update]");
-        }
         int isStaticFrameEnable = mTvOptionSettingManager.getStaticFrameStatus();
         boolean enable = (isStaticFrameEnable == 1);
         if (mTvOptionSettingManager.isChannelSource()) {
@@ -141,9 +117,6 @@ public class NoSignalScreenStatusFragment extends SettingsPreferenceFragment imp
     }
 
     private void updateScreenColorStatus(boolean isblueScreenEnable) {
-        if (CanDebug()) {
-            Log.d(TAG, "[updateScreenColorStatus]");
-        }
         if (isblueScreenEnable) {
             mBlackScreenPreference.setChecked(false);
             mBlueScreenPreference.setChecked(true);

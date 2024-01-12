@@ -17,14 +17,12 @@
 package com.droidlogic.tv.extras.tvoption;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.content.Intent;
 import android.content.DialogInterface;
 import androidx.preference.Preference;
 import androidx.preference.ListPreference;
 import androidx.preference.PreferenceCategory;
 import android.os.SystemProperties;
-import android.util.Log;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.content.Context;
@@ -33,26 +31,19 @@ import android.app.AlertDialog;
 import android.widget.TextView;
 import android.view.View.OnClickListener;
 import android.os.PowerManager;
-import android.provider.Settings;
 import android.media.tv.TvInputManager;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.view.ViewGroup;
+import android.provider.Settings;
 
-import com.droidlogic.app.HdmiCecManager;
-import com.droidlogic.tv.extras.util.DroidUtils;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.SettingsConstant;
-import com.droidlogic.tv.extras.MainFragment;
 import com.droidlogic.tv.extras.R;
 
 import com.droidlogic.app.DataProviderManager;
-import com.droidlogic.app.tv.TvControlManager;
 import com.droidlogic.app.tv.DroidLogicTvUtils;
-import com.droidlogic.app.SystemControlManager;
-import androidx.preference.SwitchPreference;
+import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
-public class DroidSettingsModeFragment extends SettingsPreferenceFragment implements Preference.OnPreferenceChangeListener {
+public class DroidSettingsModeFragment extends SettingsPreferenceFragment
+        implements Preference.OnPreferenceChangeListener {
 
     private static final String TAG = "DroidSettingsModeFragment";
 
@@ -83,7 +74,6 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment implem
     private static final String INTENT_ACTION_FINISH_FRAGMENT = "action.finish.droidsettingsmodefragment";
 
     private TvOptionSettingManager mTvOptionSettingManager;
-    private TvControlManager mTvControlManager;
     private TvInputManager mTvInputManager;
 
     public static DroidSettingsModeFragment newInstance() {
@@ -109,9 +99,7 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment implem
         if (mTvOptionSettingManager == null) {
             mTvOptionSettingManager = new TvOptionSettingManager(getActivity(), false);
         }
-        if (mTvControlManager == null) {
-            mTvControlManager = TvControlManager.getInstance();
-        }
+
         if (mTvInputManager == null) {
             mTvInputManager = (TvInputManager)getActivity().getSystemService(Context.TV_INPUT_SERVICE);
         }
@@ -129,7 +117,7 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment implem
         final Preference avParentalControls = (Preference) findPreference(AV_PARENTAL_CONTROLS);
         int deviceId = DataProviderManager.getIntValue(getContext(),
                 DroidLogicTvUtils.TV_CURRENT_DEVICE_ID, 0);
-        Log.d(TAG, "mSourceInput: " + deviceId);
+        logDebug(TAG, false, "mSourceInput: " + deviceId);
         boolean isParentControlEnabled = mTvInputManager.isParentalControlsEnabled();
         if (deviceId == DroidLogicTvUtils.DEVICE_ID_AV1
             || deviceId == DroidLogicTvUtils.DEVICE_ID_AV2) {
@@ -191,7 +179,7 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment implem
     }
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {
-        Log.d(TAG, "[onPreferenceChange] preference.getKey() = " + preference.getKey());
+        logDebug(TAG, true, "[onPreferenceChange] preference.getKey() = " + preference.getKey());
         if (TextUtils.equals(preference.getKey(), RESTORE_FACTORY)) {
             createUiDialog(RESTORE);
         } else if (TextUtils.equals(preference.getKey(), FBC_UPGRADE)) {
@@ -236,7 +224,8 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment implem
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        Log.d(TAG, "[onPreferenceChange] preference.getKey() = " + preference.getKey() + ", newValue = " + newValue);
+        logDebug(TAG, true, "[onPreferenceChange] preference.getKey() = " + preference.getKey()
+                + ", newValue = " + newValue);
         final int selection = Integer.parseInt((String)newValue);
         if (TextUtils.equals(preference.getKey(), STARTUP_SETTING)) {
             mTvOptionSettingManager.setStartupSetting(selection);
