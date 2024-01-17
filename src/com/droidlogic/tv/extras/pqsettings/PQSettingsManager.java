@@ -1368,6 +1368,34 @@ public class PQSettingsManager {
         return mSystemControlManager.SetAiColor(value, isSave);
     }
 
+    public int getMemcDemoEnabled() {
+        final int MEMC_DEMO = 0;
+        return mSystemControlManager.GetPQModuleDemoState(MEMC_DEMO);
+    }
+
+    public int setMemcDemoEnabled(boolean enable) {
+        final int MEMC_DEMO = 0;
+        int stateValue = 0;
+        if (enable) {
+            stateValue = 1;
+        }
+        return mSystemControlManager.SetPQModuleDemoState(MEMC_DEMO, stateValue);
+    }
+
+    public int getAisreDemoEnabled() {
+        final int AISR_DEMO = 1;
+        return mSystemControlManager.GetPQModuleDemoState(AISR_DEMO);
+    }
+
+    public int setAisreDemoEnabled(boolean enable) {
+        final int AISR_DEMO = 1;
+        int stateValue = 0;
+        if (enable) {
+            stateValue = 1;
+        }
+        return mSystemControlManager.SetPQModuleDemoState(AISR_DEMO, stateValue);
+    }
+
     public boolean isHdmiSource() {
         if (mTvSourceInput != null) {
             return mTvSource == TvControlManager.SourceInput_Type.SOURCE_TYPE_HDMI;

@@ -24,6 +24,10 @@
         android:entryValues="@array/memc_entry_values"
         android:title="@string/pq_picture_advanced_memc_switch"
         android:summary="%s" />
+    <SwitchPreference
+        android:key="pq_picture_advanced_memc_demo_switch"
+        android:persistent="false"
+        android:title="@string/pq_picture_advanced_memc_demo_switch" />
     <PreferenceCategory
         android:key="pq_picture_advanced_memc_customize"
         android:title="@string/pq_picture_advanced_memc_customize" />

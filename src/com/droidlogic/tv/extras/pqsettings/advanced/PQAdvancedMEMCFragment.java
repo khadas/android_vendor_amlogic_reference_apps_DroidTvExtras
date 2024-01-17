@@ -28,6 +28,7 @@ import android.text.TextUtils;
 import com.droidlogic.tv.extras.SettingsPreferenceFragment;
 import com.droidlogic.tv.extras.R;
 import com.droidlogic.tv.extras.pqsettings.PQSettingsManager;
+
 import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 
 import java.util.List;
@@ -39,14 +40,16 @@ import com.droidlogic.app.SystemControlManager;
 public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implements Preference.OnPreferenceChangeListener {
     private static final String TAG = "PQAdvancedMEMCFragment";
 
-    private static final int PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_STEP= 1;
-    private static final String PQ_PICTURE_ADVANCED_MEMC_SWITCH = "pq_picture_advanced_memc_switch";
-    private static final String PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_DEJUDDER = "pq_picture_advanced_memc_customize_dejudder";
-    private static final String PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_DEBLUR= "pq_picture_advanced_memc_customize_deblur";
+    private static final String PQ_PICTURE_ADVANCED_MEMC_SWITCH              = "pq_picture_advanced_memc_switch";
+    private static final String PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_DEJUDDER  = "pq_picture_advanced_memc_customize_dejudder";
+    private static final String PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_DEBLUR    = "pq_picture_advanced_memc_customize_deblur";
+    private static final String PQ_PICTURE_ADVANCED_MEMC_DEMO_SWITCH         = "pq_picture_advanced_memc_demo_switch";
 
     private SeekBarPreference PQPictureAdvancedMemcCustomizeDejudderPref;
     private SeekBarPreference PQPictureAdvancedMemcCustomizeDeblurPref;
+    private TwoStatePreference mMemcDemoSwitchPref;
 
+    private static final int PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_STEP         = 1;
     private boolean hasMemc = false;
     private SystemControlManager mSystemControlManager;
 
@@ -107,6 +110,9 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
             PQPictureAdvancedMemcCustomizeDeblurPref.setVisible(false);
         }
 
+        mMemcDemoSwitchPref = (TwoStatePreference) findPreference(PQ_PICTURE_ADVANCED_MEMC_DEMO_SWITCH);
+        mMemcDemoSwitchPref.setOnPreferenceChangeListener(this);
+        mMemcDemoSwitchPref.setChecked(mPQSettingsManager.getMemcDemoEnabled() >= 1 ? true : false);
         updateMemcCustomizeDisplay(mPQSettingsManager.getAdvancedMemcSwitchStatus());
 
     }
@@ -118,18 +124,23 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object newValue) {
-        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey()+" newValue:"+newValue);
+        if (TextUtils.equals(preference.getKey(), PQ_PICTURE_ADVANCED_MEMC_DEMO_SWITCH)) {
+            mPQSettingsManager.setMemcDemoEnabled((boolean) newValue);
+            return true;
+        }
+
+        logDebug(TAG, false, "[onPreferenceTreeClick] preference.getKey() = " + preference.getKey() + " newValue:" + newValue);
         switch (preference.getKey()) {
             case PQ_PICTURE_ADVANCED_MEMC_SWITCH:
-                final int selection = Integer.parseInt((String)newValue);
+                final int selection = Integer.parseInt((String) newValue);
                 updateMemcCustomizeDisplay(selection);
                 mPQSettingsManager.setAdvancedMemcSwitchStatus(selection);
                 break;
             case PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_DEJUDDER:
-                mPQSettingsManager.setAdvancedMemcCustomizeDejudderStatus((int)newValue);
+                mPQSettingsManager.setAdvancedMemcCustomizeDejudderStatus((int) newValue);
                 break;
             case PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_DEBLUR:
-                mPQSettingsManager.setAdvancedMemcCustomizeDeblurStatus((int)newValue);
+                mPQSettingsManager.setAdvancedMemcCustomizeDeblurStatus((int) newValue);
                 break;
             default:
                 break;
@@ -143,7 +154,7 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
     }
 
     private void updateMemcCustomizeDisplay(int value) {
-        if ( 1 == value ) {
+        if (1 == value) {
             PQPictureAdvancedMemcCustomizeDeblurPref.setEnabled(true);
             PQPictureAdvancedMemcCustomizeDejudderPref.setEnabled(true);
         } else {

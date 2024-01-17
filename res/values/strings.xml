@@ -2549,6 +2549,7 @@
     <string name="pq_picture_advanced_decontour">Decontour</string>
     <string name="pq_picture_advanced_memc">MEMC</string>
     <string name="pq_picture_advanced_memc_switch">MEMC Switch</string>
+    <string name="pq_picture_advanced_memc_demo_switch">MEMC Demo</string>
     <string name="pq_picture_advanced_manual_gamma_level">Level</string>
     <string name="pq_picture_advanced_manual_gamma_rgain">R Gain</string>
     <string name="pq_picture_advanced_manual_gamma_ggain">G Gain</string>
@@ -2854,6 +2855,7 @@
     <string name="pq_ai_pq_sr">AI-PQ/AI-SR</string>
     <string name="ai_pq_enable">Enable AI PQ</string>
     <string name="ai_pq_info_enable">Show AI PQ information</string>
+    <string name="ai_pq_aisr_demo_switch">AISR Demo</string>
     <string name="prepare">AI PQ invalid value...</string>
     <string name="frame_rate">FrameRate</string>
     <string name="frame_rate_enable">Enable FrameRate</string>

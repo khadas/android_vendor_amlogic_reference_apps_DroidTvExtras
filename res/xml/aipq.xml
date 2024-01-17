@@ -34,4 +34,8 @@
         android:key="ai_color_enable"
         android:persistent="true"
         android:title="@string/ai_color_enable" />
+      <SwitchPreference
+       android:key="ai_pq_aisr_demo_switch"
+       android:persistent="true"
+       android:title="@string/ai_pq_aisr_demo_switch" />
 </PreferenceScreen>

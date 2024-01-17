@@ -39,6 +39,8 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
     public static final String KEY_ENABLE_AIPQ_INFO = "ai_pq_info_enable";
     private static final String KEY_ENABLE_AISR = "ai_sr_enable";
     private static final String KEY_ENABLE_AI_COLOR = "ai_color_enable";
+    private static final String KEY_ENABLE_AISR_DEMO = "ai_pq_aisr_demo_switch";
+
     private static final String SYSFS_DEBUG_VDETECT = "/sys/module/decoder_common/parameters/debug_vdetect";
     private static final String SYSFS_ADD_VDETECT = "/sys/class/vdetect/tv_add_vdetect";
 
@@ -51,6 +53,7 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
     private TwoStatePreference mEnableAisrPref;
     private TwoStatePreference mEnableAipqInfoPref;
     private TwoStatePreference mEnableAiColorPref;
+    private TwoStatePreference mEnableAisrDemoPref;
 
     private PQSettingsManager mPQSettingsManager;
     private SystemControlManager mSystemControlManager;
@@ -101,6 +104,10 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
         mEnableAiColorPref = (TwoStatePreference) findPreference(KEY_ENABLE_AI_COLOR);
         mEnableAiColorPref.setOnPreferenceChangeListener(this);
         mEnableAiColorPref.setChecked(mPQSettingsManager.getAiColor() == 1);
+
+        mEnableAisrDemoPref = (TwoStatePreference) findPreference(KEY_ENABLE_AISR_DEMO);
+        mEnableAisrDemoPref.setOnPreferenceChangeListener(this);
+        mEnableAisrDemoPref.setChecked(mPQSettingsManager.getAisreDemoEnabled() >= 1 ? true : false);
     }
 
     @Override
@@ -135,6 +142,8 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
             mPQSettingsManager.setAisrEnabled((boolean) newValue);
         } else if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AI_COLOR)) {
             mPQSettingsManager.setAiColor(((boolean) newValue) == true ? 1 : 0, 1);
+        } else if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AISR_DEMO)) {
+            mPQSettingsManager.setAisreDemoEnabled((boolean) newValue);
         }
         return true;
     }
