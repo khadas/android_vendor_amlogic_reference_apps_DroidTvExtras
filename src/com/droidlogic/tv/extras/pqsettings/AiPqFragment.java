@@ -123,7 +123,7 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
                 mSystemControlManager.setProperty(PROP_AIPQ_ENABLE, "false");
                 // As a result of SWPL-67409, AiPqService has been migrated
                 // into DroidLogic as a viable service using ContentObserver listening.
-                Settings.System.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_DISABLE);
+                Settings.Global.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_DISABLE);
             }
             mPQSettingsManager.setAipqEnabled((boolean) newValue);
         } else if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AIPQ_INFO)) {
@@ -131,12 +131,12 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
                 mSystemControlManager.setProperty(PROP_AIPQ_ENABLE, "true");
                 // As a result of SWPL-67409, AiPqService has been migrated
                 // into DroidLogic as a viable service using ContentObserver listening.
-                Settings.System.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_ENABLE);
+                Settings.Global.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_ENABLE);
             } else {
                 mSystemControlManager.setProperty(PROP_AIPQ_ENABLE, "false");
                 // As a result of SWPL-67409, AiPqService has been migrated
                 // into DroidLogic as a viable service using ContentObserver listening.
-                Settings.System.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_DISABLE);
+                Settings.Global.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_DISABLE);
             }
         } else if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AISR)) {
             mPQSettingsManager.setAisrEnabled((boolean) newValue);
