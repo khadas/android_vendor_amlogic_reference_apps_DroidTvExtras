@@ -78,7 +78,8 @@ public class Hdmi20SwitchFragment extends SettingsPreferenceFragment implements 
         int no = mTvOptionSettingManager.getNumOfHdmi();
         logDebug(TAG, false, "refresh:" + no
                 + ",total size:" + getPreferenceScreen().getPreferenceCount());
-        for (int i = no; i < getPreferenceScreen().getPreferenceCount(); i++) {
+        int preferenceCount = getPreferenceScreen().getPreferenceCount();
+        for (int i = no; i < preferenceCount; i++) {
             getPreferenceScreen().removePreference(all.get(i));
         }
     }
