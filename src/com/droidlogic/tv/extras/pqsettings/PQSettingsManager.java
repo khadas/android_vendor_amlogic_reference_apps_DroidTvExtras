@@ -461,15 +461,15 @@ public class PQSettingsManager {
     }
 
     public int getAdvancedMemcCustomizeDejudderStatus () {
-        // Leave blank first, add later
-        logDebug(TAG, false, "getAdvancedMemcCustomizeDejudderStatus");
-        return 5;
+        int DeJudderStatus = mSystemControlManager.GetMemcDeJudderLevel();
+        logDebug(TAG, false, "deBlurStatus: " + DeJudderStatus);
+        return DeJudderStatus;
     }
 
     public int getAdvancedMemcCustomizeDeblurStatus () {
-        // Leave blank first, add later
-        logDebug(TAG, false, "getAdvancedMemcCustomizeDeblurStatus");
-        return 5;
+        int deBlurStatus = mSystemControlManager.GetMemcDeBlurLevel();
+        logDebug(TAG, false, "deBlurStatus: " + deBlurStatus);
+        return deBlurStatus;
     }
 
     public int getAdvancedGammaStatus () {
@@ -988,11 +988,11 @@ public class PQSettingsManager {
     }
 
     public void setAdvancedMemcCustomizeDejudderStatus (int value) {
-        // Leave blank first, add later
+        mSystemControlManager.SetMemcDeJudderLevel(value, mSave);
     }
 
     public void setAdvancedMemcCustomizeDeblurStatus (int value) {
-        // Leave blank first, add later
+        mSystemControlManager.SetMemcDeBlurLevel(value, mSave);
     }
 
     // 0 1 2 3 ~ standard warm1 cool warm2
