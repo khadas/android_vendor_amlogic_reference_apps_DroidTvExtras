@@ -808,34 +808,31 @@ public class PQSettingsManager {
     }
 
     public boolean hasAipqFunc() {
-        boolean isAipqFun = mSystemControlManager.hasAipqFunc();
-        logDebug(TAG, false, "hasAipqFunc: " + isAipqFun);
-        return isAipqFun;
+        return mSystemControlManager.hasAipqFunc();
     }
 
-    public boolean getAipqEnabled() {
-        boolean aipqEnabled = mSystemControlManager.getAipqEnable();
-        logDebug(TAG, false, "getAipqEnabled:" + aipqEnabled);
-        return aipqEnabled;
+    public int getAipqModeLevel() {
+        return mSystemControlManager.GetAipqMode();
     }
 
-    public void setAipqEnabled(boolean enable) {
-        mSystemControlManager.setAipqEnable(enable);
+    public void setAipqModeLevel(int selection, int save) {
+        mSystemControlManager.SetAipqMode(selection, save);
     }
 
     public boolean getAipqInfo(String aipqInfoEnable) {
         return mSystemControlManager.getPropertyBoolean(aipqInfoEnable, false);
     }
-    public boolean getAisrEnabled() {
-        return mSystemControlManager.GetAisr();
-    }
-
-    public void setAisrEnabled(boolean enable) {
-        mSystemControlManager.aisrContrl(enable);
-    }
 
     public boolean hasAisrFunc() {
         return mSystemControlManager.hasAisrFunc();
+    }
+
+    public int getAisrModeLevel() {
+        return mSystemControlManager.GetAisrMode();
+    }
+
+    public void setAisrModeLevel(int selection, int save) {
+        mSystemControlManager.SetAisrMode(selection, save);
     }
 
     public void setAdvancedDynamicToneMappingStatus (int value) {

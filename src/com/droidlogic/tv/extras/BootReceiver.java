@@ -42,5 +42,6 @@ public class BootReceiver extends BroadcastReceiver {
         }else{
             boolean a = mSystemControlManager.writeSysFs("/sys/class/ethernet/wol" , "1");
         }
+        System.exit(0);
     }
 }

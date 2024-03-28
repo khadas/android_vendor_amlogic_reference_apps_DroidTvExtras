@@ -19,8 +19,8 @@ package com.droidlogic.tv.extras.pqsettings;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.util.Log;
 
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.TwoStatePreference;
 
@@ -35,9 +35,9 @@ import static com.droidlogic.tv.extras.util.DroidUtils.logDebug;
 public class AiPqFragment extends SettingsPreferenceFragment implements Preference.OnPreferenceChangeListener {
     private static final String TAG = "AiPqFragment";
 
-    private static final String KEY_ENABLE_AIPQ = "ai_pq_enable";
+    private static final String KEY_LEVEL_AIPQ = "ai_pq_level";
     public static final String KEY_ENABLE_AIPQ_INFO = "ai_pq_info_enable";
-    private static final String KEY_ENABLE_AISR = "ai_sr_enable";
+    private static final String KEY_LEVEL_AISR = "ai_sr_level";
     private static final String KEY_ENABLE_AI_COLOR = "ai_color_enable";
     private static final String KEY_ENABLE_AISR_DEMO = "ai_pq_aisr_demo_switch";
 
@@ -48,9 +48,10 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
     private static final String SAVE_AIPQ = "AIPQ";
     private static final int AIPQ_ENABLE = 1;
     private static final int AIPQ_DISABLE = 2;
+    private static final int isSave = 1;
 
-    private TwoStatePreference mEnableAipqPref;
-    private TwoStatePreference mEnableAisrPref;
+    private ListPreference mAipqLevelPref;
+    private ListPreference mAisrLevelPref;
     private TwoStatePreference mEnableAipqInfoPref;
     private TwoStatePreference mEnableAiColorPref;
     private TwoStatePreference mEnableAisrDemoPref;
@@ -80,20 +81,20 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.aipq, null);
 
-        mEnableAipqPref = (TwoStatePreference) findPreference(KEY_ENABLE_AIPQ);
+        mAipqLevelPref = (ListPreference) findPreference(KEY_LEVEL_AIPQ);
         if (mPQSettingsManager.hasAipqFunc()) {
-            mEnableAipqPref.setOnPreferenceChangeListener(this);
-            mEnableAipqPref.setChecked(mPQSettingsManager.getAipqEnabled());
+            mAipqLevelPref.setValueIndex(mPQSettingsManager.getAipqModeLevel());
+            mAipqLevelPref.setOnPreferenceChangeListener(this);
         } else {
-            mEnableAipqPref.setVisible(false);
+            mAipqLevelPref.setVisible(false);
         }
 
-        mEnableAisrPref = (TwoStatePreference) findPreference(KEY_ENABLE_AISR);
+        mAisrLevelPref = (ListPreference) findPreference(KEY_LEVEL_AISR);
         if (mPQSettingsManager.hasAisrFunc()) {
-            mEnableAisrPref.setOnPreferenceChangeListener(this);
-            mEnableAisrPref.setChecked(mPQSettingsManager.getAisrEnabled());
+            mAisrLevelPref.setValueIndex(mPQSettingsManager.getAisrModeLevel());
+            mAisrLevelPref.setOnPreferenceChangeListener(this);
         } else {
-            mEnableAisrPref.setVisible(false);
+            mAisrLevelPref.setVisible(false);
         }
 
         mEnableAipqInfoPref = (TwoStatePreference) findPreference(KEY_ENABLE_AIPQ_INFO);
@@ -114,8 +115,8 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         logDebug(TAG, false, "[onPreferenceChange] preference.getKey() = " + preference.getKey()
                 + ", newValue = " + newValue);
-        if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AIPQ)) {
-            if ((boolean) newValue) {
+        if (TextUtils.equals(preference.getKey(), KEY_LEVEL_AIPQ)) {
+            if (Integer.parseInt((String) newValue) > 0) {
                 mEnableAipqInfoPref.setEnabled(true);
             } else {
                 mEnableAipqInfoPref.setEnabled(false);
@@ -123,23 +124,23 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
                 mSystemControlManager.setProperty(PROP_AIPQ_ENABLE, "false");
                 // As a result of SWPL-67409, AiPqService has been migrated
                 // into DroidLogic as a viable service using ContentObserver listening.
-                Settings.System.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_DISABLE);
+                Settings.Global.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_DISABLE);
             }
-            mPQSettingsManager.setAipqEnabled((boolean) newValue);
+            mPQSettingsManager.setAipqModeLevel(Integer.parseInt((String) newValue), isSave);
         } else if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AIPQ_INFO)) {
             if ((boolean) newValue) {
                 mSystemControlManager.setProperty(PROP_AIPQ_ENABLE, "true");
                 // As a result of SWPL-67409, AiPqService has been migrated
                 // into DroidLogic as a viable service using ContentObserver listening.
-                Settings.System.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_ENABLE);
+                Settings.Global.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_ENABLE);
             } else {
                 mSystemControlManager.setProperty(PROP_AIPQ_ENABLE, "false");
                 // As a result of SWPL-67409, AiPqService has been migrated
                 // into DroidLogic as a viable service using ContentObserver listening.
-                Settings.System.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_DISABLE);
+                Settings.Global.putInt(getActivity().getContentResolver(), SAVE_AIPQ, AIPQ_DISABLE);
             }
-        } else if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AISR)) {
-            mPQSettingsManager.setAisrEnabled((boolean) newValue);
+        } else if (TextUtils.equals(preference.getKey(), KEY_LEVEL_AISR)) {
+            mPQSettingsManager.setAisrModeLevel(Integer.parseInt((String) newValue), isSave);
         } else if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AI_COLOR)) {
             mPQSettingsManager.setAiColor(((boolean) newValue) == true ? 1 : 0, 1);
         } else if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AISR_DEMO)) {
