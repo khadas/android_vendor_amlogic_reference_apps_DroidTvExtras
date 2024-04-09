@@ -47,7 +47,13 @@ public class PQAdvancedManualGammaFragment extends SettingsPreferenceFragment im
     private static final String PQ_PICTURE_ADVANCED_MANUAL_GAMMA_GGAIN = "pq_picture_advanced_manual_gamma_ggain";
     private static final String PQ_PICTURE_ADVANCED_MANUAL_GAMMA_BGAIN = "pq_picture_advanced_manual_gamma_bgain";
     private static final String PQ_PICTURE_ADVANCED_MANUAL_GAMMA_RESET = "pq_picture_advanced_manual_gamma_reset";
+    private static SeekBarPreference PQPictureAdvancedManualGammaLevelPref;
+    private static SeekBarPreference PQPictureAdvancedManualGammaRGainPref;
+    private static SeekBarPreference PQPictureAdvancedManualGammaGGainPref;
+    private static SeekBarPreference PQPictureAdvancedManualGammaBGainPref;
+
     private static final int PQ_PICTURE_ADVANCED_MANUAL_STEP = 1;
+    private static int PQ_PICTURE_ManualGamma_LEVEL = 0;
 
     private PQSettingsManager mPQSettingsManager;
 
@@ -75,40 +81,39 @@ public class PQAdvancedManualGammaFragment extends SettingsPreferenceFragment im
             mPQSettingsManager = new PQSettingsManager(getActivity());
         }
 
-        final SeekBarPreference PQPictureAdvancedManualGammaLevelPref = (SeekBarPreference) findPreference(PQ_PICTURE_ADVANCED_MANUAL_GAMMA_LEVEL);
-        final SeekBarPreference PQPictureAdvancedManualGammaRGainPref = (SeekBarPreference) findPreference(PQ_PICTURE_ADVANCED_MANUAL_GAMMA_RGAIN);
-        final SeekBarPreference PQPictureAdvancedManualGammaGGainPref = (SeekBarPreference) findPreference(PQ_PICTURE_ADVANCED_MANUAL_GAMMA_GGAIN);
-        final SeekBarPreference PQPictureAdvancedManualGammaBGainPref = (SeekBarPreference) findPreference(PQ_PICTURE_ADVANCED_MANUAL_GAMMA_BGAIN);
+        PQPictureAdvancedManualGammaLevelPref = (SeekBarPreference) findPreference(PQ_PICTURE_ADVANCED_MANUAL_GAMMA_LEVEL);
+        PQPictureAdvancedManualGammaRGainPref = (SeekBarPreference) findPreference(PQ_PICTURE_ADVANCED_MANUAL_GAMMA_RGAIN);
+        PQPictureAdvancedManualGammaGGainPref = (SeekBarPreference) findPreference(PQ_PICTURE_ADVANCED_MANUAL_GAMMA_GGAIN);
+        PQPictureAdvancedManualGammaBGainPref = (SeekBarPreference) findPreference(PQ_PICTURE_ADVANCED_MANUAL_GAMMA_BGAIN);
         final Preference PQPictureAdvancedManualGammaResetPref = (Preference) findPreference(PQ_PICTURE_ADVANCED_MANUAL_GAMMA_RESET);
 
         PQPictureAdvancedManualGammaLevelPref.setOnPreferenceChangeListener(this);
         PQPictureAdvancedManualGammaLevelPref.setSeekBarIncrement(PQ_PICTURE_ADVANCED_MANUAL_STEP);
+        //The display value of level starts from 0.
         PQPictureAdvancedManualGammaLevelPref.setMin(0);
         PQPictureAdvancedManualGammaLevelPref.setMax(10);
-        PQPictureAdvancedManualGammaLevelPref.setValue(mPQSettingsManager.getAdvancedManualGammaLevelStatus());
+        PQPictureAdvancedManualGammaLevelPref.setValue(0);
         PQPictureAdvancedManualGammaLevelPref.setVisible(true);
 
         PQPictureAdvancedManualGammaRGainPref.setOnPreferenceChangeListener(this);
         PQPictureAdvancedManualGammaRGainPref.setSeekBarIncrement(PQ_PICTURE_ADVANCED_MANUAL_STEP);
         PQPictureAdvancedManualGammaRGainPref.setMin(-50);
         PQPictureAdvancedManualGammaRGainPref.setMax(50);
-        PQPictureAdvancedManualGammaRGainPref.setValue(mPQSettingsManager.getAdvancedManualGammaRGainStatus());
-        PQPictureAdvancedManualGammaRGainPref.setVisible(true);
 
         PQPictureAdvancedManualGammaGGainPref.setOnPreferenceChangeListener(this);
         PQPictureAdvancedManualGammaGGainPref.setSeekBarIncrement(PQ_PICTURE_ADVANCED_MANUAL_STEP);
         PQPictureAdvancedManualGammaGGainPref.setMin(-50);
         PQPictureAdvancedManualGammaGGainPref.setMax(50);
-        PQPictureAdvancedManualGammaGGainPref.setValue(mPQSettingsManager.getAdvancedManualGammaGGainStatus());
-        PQPictureAdvancedManualGammaGGainPref.setVisible(true);
 
         PQPictureAdvancedManualGammaBGainPref.setOnPreferenceChangeListener(this);
         PQPictureAdvancedManualGammaBGainPref.setSeekBarIncrement(PQ_PICTURE_ADVANCED_MANUAL_STEP);
         PQPictureAdvancedManualGammaBGainPref.setMin(-50);
         PQPictureAdvancedManualGammaBGainPref.setMax(50);
-        PQPictureAdvancedManualGammaBGainPref.setValue(mPQSettingsManager.getAdvancedManualGammaBGainStatus());
-        PQPictureAdvancedManualGammaBGainPref.setVisible(true);
 
+        updateManualGamma(0);
+        PQPictureAdvancedManualGammaRGainPref.setVisible(true);
+        PQPictureAdvancedManualGammaGGainPref.setVisible(true);
+        PQPictureAdvancedManualGammaBGainPref.setVisible(true);
     }
 
     @Override
@@ -130,21 +135,46 @@ public class PQAdvancedManualGammaFragment extends SettingsPreferenceFragment im
     public boolean onPreferenceChange(Preference preference, Object newValue) {
         switch (preference.getKey()) {
             case PQ_PICTURE_ADVANCED_MANUAL_GAMMA_LEVEL:
-                mPQSettingsManager.setAdvancedManualGammaLevelStatus((int)newValue);
+                PQ_PICTURE_ManualGamma_LEVEL = (int)newValue;
+                updateManualGamma(PQ_PICTURE_ManualGamma_LEVEL);
                 break;
             case PQ_PICTURE_ADVANCED_MANUAL_GAMMA_RGAIN:
-                mPQSettingsManager.setAdvancedManualGammaRGainStatus((int)newValue);
+                mPQSettingsManager.setWhiteBalanceGamma(
+                        PQSettingsManager.RGB_CHANNEL_TYPE.RED_CH.getVal(),
+                        PQ_PICTURE_ManualGamma_LEVEL,
+                        (int)newValue
+                        );
                 break;
             case PQ_PICTURE_ADVANCED_MANUAL_GAMMA_GGAIN:
-                mPQSettingsManager.setAdvancedManualGammaGGainStatus((int)newValue);
+                mPQSettingsManager.setWhiteBalanceGamma(
+                        PQSettingsManager.RGB_CHANNEL_TYPE.GREEN_CH.getVal(),
+                        PQ_PICTURE_ManualGamma_LEVEL,
+                        (int)newValue
+                );
                 break;
             case PQ_PICTURE_ADVANCED_MANUAL_GAMMA_BGAIN:
-                mPQSettingsManager.setAdvancedManualGammaBGainStatus((int)newValue);
+                mPQSettingsManager.setWhiteBalanceGamma(
+                        PQSettingsManager.RGB_CHANNEL_TYPE.BLUE_CH.getVal(),
+                        PQ_PICTURE_ManualGamma_LEVEL,
+                        (int)newValue
+                );
                 break;
             default:
                 break;
         }
         return true;
+    }
+
+    private void updateManualGamma(int pq_picture_manualGamma_level) {
+        PQPictureAdvancedManualGammaRGainPref.setValue(
+                mPQSettingsManager.getWhiteBalanceGamma(
+                        PQSettingsManager.RGB_CHANNEL_TYPE.RED_CH.getVal(), pq_picture_manualGamma_level));
+        PQPictureAdvancedManualGammaGGainPref.setValue(
+                mPQSettingsManager.getWhiteBalanceGamma(
+                        PQSettingsManager.RGB_CHANNEL_TYPE.GREEN_CH.getVal(), pq_picture_manualGamma_level));
+        PQPictureAdvancedManualGammaBGainPref.setValue(
+                mPQSettingsManager.getWhiteBalanceGamma(
+                        PQSettingsManager.RGB_CHANNEL_TYPE.BLUE_CH.getVal(), pq_picture_manualGamma_level));
     }
 
     @Override

@@ -363,6 +363,22 @@ public class PQSettingsManager {
         }
     }
 
+    public enum RGB_CHANNEL_TYPE {
+        RED_CH(0),
+        GREEN_CH(1),
+        BLUE_CH(2),
+        MAX_CH(3);
+        private int val;
+
+        RGB_CHANNEL_TYPE(int val) {
+            this.val = val;
+        }
+
+        public int getVal() {
+            return val;
+        }
+    }
+
     public int getAspectRatioStatus () {
         int itemPosition = mSystemControlManager.GetDisplayMode(TvControlManager.SourceInput.XXXX.toInt());
         logDebug(TAG, false, "getAspectRatioStatus:" + itemPosition);
@@ -476,28 +492,12 @@ public class PQSettingsManager {
         return mSystemControlManager.GetGammaValue() + ADVANCED_GAMMA_FIXED_DIFFERENCE;
     }
 
-    public int getAdvancedManualGammaLevelStatus () {
-        // Leave blank first, add later
-        logDebug(TAG, false, "getAdvancedManualGammaLevelStatus");
-        return 0;
+    public int getWhiteBalanceGamma(int channel, int point) {
+        return mSystemControlManager.GetWhitebalanceGamma(channel, point);
     }
 
-    public int getAdvancedManualGammaRGainStatus () {
-        // Leave blank first, add later
-        logDebug(TAG, false, "getAdvancedManualGammaRGainStatus");
-        return 0;
-    }
-
-    public int getAdvancedManualGammaGGainStatus () {
-        // Leave blank first, add later
-        logDebug(TAG, false, "getAdvancedManualGammaGGainStatus");
-        return 0;
-    }
-
-    public int getAdvancedManualGammaBGainStatus () {
-        // Leave blank first, add later
-        logDebug(TAG, false, "getAdvancedManualGammaBGainStatus");
-        return 0;
+    public void setWhiteBalanceGamma(int channel, int point, int offset) {
+        mSystemControlManager.SetWhitebalanceGamma(channel, point, offset);
     }
 
     public int getColorTemperatureStatus () {
@@ -969,22 +969,6 @@ public class PQSettingsManager {
 
     public void setAdvancedGammaStatus (int value) {
         mSystemControlManager.SetGammaValue(value - ADVANCED_GAMMA_FIXED_DIFFERENCE, 1);
-    }
-
-    public void setAdvancedManualGammaLevelStatus (int value) {
-        // Leave blank first, add later
-    }
-
-    public void setAdvancedManualGammaRGainStatus (int value) {
-        // Leave blank first, add later
-    }
-
-    public void setAdvancedManualGammaGGainStatus (int value) {
-        // Leave blank first, add later
-    }
-
-    public void setAdvancedManualGammaBGainStatus (int value) {
-        // Leave blank first, add later
     }
 
     public void setAdvancedMemcCustomizeDejudderStatus (int value) {
