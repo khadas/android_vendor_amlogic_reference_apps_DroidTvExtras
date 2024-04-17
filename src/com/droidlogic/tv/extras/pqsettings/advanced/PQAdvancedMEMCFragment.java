@@ -49,9 +49,7 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
     private SeekBarPreference PQPictureAdvancedMemcCustomizeDeblurPref;
     private TwoStatePreference mMemcDemoSwitchPref;
 
-    private static final int PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_STEP         = 1;
-    private boolean hasMemc = false;
-    private SystemControlManager mSystemControlManager;
+    private static final int PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_STEP = 1;
 
     private PQSettingsManager mPQSettingsManager;
 
@@ -77,44 +75,29 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
         final ListPreference pictureAdvancedMemcSwitchPref = (ListPreference) findPreference(PQ_PICTURE_ADVANCED_MEMC_SWITCH);
         PQPictureAdvancedMemcCustomizeDejudderPref = (SeekBarPreference) findPreference(PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_DEJUDDER);
         PQPictureAdvancedMemcCustomizeDeblurPref = (SeekBarPreference) findPreference(PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_DEBLUR);
-        mSystemControlManager = SystemControlManager.getInstance();
 
-        hasMemc = mSystemControlManager.hasMemcFunc();
-        if (hasMemc) {
-            pictureAdvancedMemcSwitchPref.setVisible(true);
-            pictureAdvancedMemcSwitchPref.setValueIndex(mPQSettingsManager.getAdvancedMemcSwitchStatus());
-            pictureAdvancedMemcSwitchPref.setOnPreferenceChangeListener(this);
-        } else {
-            pictureAdvancedMemcSwitchPref.setVisible(false);
-        }
+        pictureAdvancedMemcSwitchPref.setVisible(true);
+        pictureAdvancedMemcSwitchPref.setValueIndex(mPQSettingsManager.getAdvancedMemcSwitchStatus());
+        pictureAdvancedMemcSwitchPref.setOnPreferenceChangeListener(this);
 
-        if (hasMemc) {
-            PQPictureAdvancedMemcCustomizeDejudderPref.setOnPreferenceChangeListener(this);
-            PQPictureAdvancedMemcCustomizeDejudderPref.setSeekBarIncrement(PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_STEP);
-            PQPictureAdvancedMemcCustomizeDejudderPref.setMin(0);
-            PQPictureAdvancedMemcCustomizeDejudderPref.setMax(10);
-            PQPictureAdvancedMemcCustomizeDejudderPref.setValue(mPQSettingsManager.getAdvancedMemcCustomizeDejudderStatus());
-            PQPictureAdvancedMemcCustomizeDejudderPref.setVisible(true);
-        } else {
-            PQPictureAdvancedMemcCustomizeDejudderPref.setVisible(false);
-        }
+        PQPictureAdvancedMemcCustomizeDejudderPref.setOnPreferenceChangeListener(this);
+        PQPictureAdvancedMemcCustomizeDejudderPref.setSeekBarIncrement(PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_STEP);
+        PQPictureAdvancedMemcCustomizeDejudderPref.setMin(0);
+        PQPictureAdvancedMemcCustomizeDejudderPref.setMax(10);
+        PQPictureAdvancedMemcCustomizeDejudderPref.setValue(mPQSettingsManager.getAdvancedMemcCustomizeDejudderStatus());
+        PQPictureAdvancedMemcCustomizeDejudderPref.setVisible(true);
 
-        if (hasMemc) {
-            PQPictureAdvancedMemcCustomizeDeblurPref.setOnPreferenceChangeListener(this);
-            PQPictureAdvancedMemcCustomizeDeblurPref.setSeekBarIncrement(PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_STEP);
-            PQPictureAdvancedMemcCustomizeDeblurPref.setMin(0);
-            PQPictureAdvancedMemcCustomizeDeblurPref.setMax(10);
-            PQPictureAdvancedMemcCustomizeDeblurPref.setValue(mPQSettingsManager.getAdvancedMemcCustomizeDeblurStatus());
-            PQPictureAdvancedMemcCustomizeDeblurPref.setVisible(true);
-        } else {
-            PQPictureAdvancedMemcCustomizeDeblurPref.setVisible(false);
-        }
+        PQPictureAdvancedMemcCustomizeDeblurPref.setOnPreferenceChangeListener(this);
+        PQPictureAdvancedMemcCustomizeDeblurPref.setSeekBarIncrement(PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_STEP);
+        PQPictureAdvancedMemcCustomizeDeblurPref.setMin(0);
+        PQPictureAdvancedMemcCustomizeDeblurPref.setMax(10);
+        PQPictureAdvancedMemcCustomizeDeblurPref.setValue(mPQSettingsManager.getAdvancedMemcCustomizeDeblurStatus());
+        PQPictureAdvancedMemcCustomizeDeblurPref.setVisible(true);
 
         mMemcDemoSwitchPref = (TwoStatePreference) findPreference(PQ_PICTURE_ADVANCED_MEMC_DEMO_SWITCH);
         mMemcDemoSwitchPref.setOnPreferenceChangeListener(this);
         mMemcDemoSwitchPref.setChecked(mPQSettingsManager.getMemcDemoEnabled() >= 1 ? true : false);
         updateMemcCustomizeDisplay(mPQSettingsManager.getAdvancedMemcSwitchStatus());
-
     }
 
     @Override
@@ -133,8 +116,8 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
         switch (preference.getKey()) {
             case PQ_PICTURE_ADVANCED_MEMC_SWITCH:
                 final int selection = Integer.parseInt((String) newValue);
-                updateMemcCustomizeDisplay(selection);
                 mPQSettingsManager.setAdvancedMemcSwitchStatus(selection);
+                updateMemcCustomizeDisplay(selection);
                 break;
             case PQ_PICTURE_ADVANCED_MEMC_CUSTOMIZE_DEJUDDER:
                 mPQSettingsManager.setAdvancedMemcCustomizeDejudderStatus((int) newValue);
@@ -154,7 +137,7 @@ public class PQAdvancedMEMCFragment extends SettingsPreferenceFragment implement
     }
 
     private void updateMemcCustomizeDisplay(int value) {
-        if (1 == value) {
+        if (4 == value) {
             PQPictureAdvancedMemcCustomizeDeblurPref.setEnabled(true);
             PQPictureAdvancedMemcCustomizeDejudderPref.setEnabled(true);
         } else {
