@@ -255,7 +255,7 @@ public class PQSettingsManager {
     public boolean getVrr() {
         int vrrEnabled = mTvControlManager.GetVRREnable();
         logDebug(TAG, false, "vrrEnabled: " + vrrEnabled);
-        return vrrEnabled == 1 ? true : false; //1 is on ,0 is off
+        return vrrEnabled == 1; //1 is on ,0 is off
     }
 
     /**
@@ -265,6 +265,18 @@ public class PQSettingsManager {
     public void setVrr(boolean enableVrr) {
         logDebug(TAG, false, "enableVrr: " + enableVrr);
         mTvControlManager.SetVRREnable(enableVrr ? 1 : 0);
+    }
+
+    public boolean isSupportQMS() {
+        return mTvControlManager.IsSupportQMS();
+    }
+
+    public boolean getQMSEnable() {
+        return mTvControlManager.GetQMSEnable();
+    }
+
+    public void setQMSEnable(boolean enableQms) {
+        mTvControlManager.SetQMSEnable(enableQms ? 1 : 0);
     }
 
     private TvControlManager.HdmiPortID getCurrentHdmiPortId(final int currentSourceInput){

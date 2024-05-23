@@ -2605,6 +2605,7 @@
     <string name="pq_picture_advanced_memc_customize">Customize</string>
     <string name="pq_picture_advanced_memc_customize_dejudder">DeJudder</string>
     <string name="pq_picture_advanced_memc_customize_deblur">DeBlur</string>
+    <string name="pq_picture_advanced_qms_switch">Quick Media Switching</string>
     <string name="pq_allreset">Reset</string>
     <string name="pq_allreset_title">Picture Mode Reset</string>
     <string name="pq_allreset_success">Picture Reset Success</string>

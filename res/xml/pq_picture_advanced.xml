@@ -39,6 +39,10 @@
         android:key="pq_picture_advanced_vrr"
         android:persistent="true"
         android:title="@string/pq_picture_advanced_vrr_or_freesync" />
+    <SwitchPreference
+        android:key="pq_picture_advanced_qms"
+        android:persistent="true"
+        android:title="@string/pq_picture_advanced_qms_switch" />
     <Preference
         android:fragment="com.droidlogic.tv.extras.pqsettings.advanced.PQAdvancedGammaFragment"
         android:key="pq_picture_advanced_gamma"

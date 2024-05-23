@@ -125,10 +125,7 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment
         } else {
             avParentalControls.setVisible(false);
         }
-        if (deviceId != DroidLogicTvUtils.DEVICE_ID_HDMI1
-            && deviceId != DroidLogicTvUtils.DEVICE_ID_HDMI2
-            && deviceId != DroidLogicTvUtils.DEVICE_ID_HDMI3
-            && deviceId != DroidLogicTvUtils.DEVICE_ID_HDMI4) {
+        if (deviceId < DroidLogicTvUtils.DEVICE_ID_HDMI1 || deviceId > DroidLogicTvUtils.DEVICE_ID_HDMI4) {
             hdmiSwitch.setVisible(false);
         }
         if (isParentControlEnabled) {
@@ -175,7 +172,6 @@ public class DroidSettingsModeFragment extends SettingsPreferenceFragment
         }
         final Preference factoryRestore = (Preference) findPreference(RESTORE_FACTORY);
         factoryRestore.setVisible(false);
-
     }
     @Override
     public boolean onPreferenceTreeClick(Preference preference) {

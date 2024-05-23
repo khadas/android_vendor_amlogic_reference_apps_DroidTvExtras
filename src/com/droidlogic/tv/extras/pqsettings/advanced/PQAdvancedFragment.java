@@ -28,6 +28,7 @@ import androidx.preference.Preference.OnPreferenceChangeListener;
 import android.util.ArrayMap;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
@@ -61,6 +62,7 @@ public class PQAdvancedFragment extends SettingsPreferenceFragment implements Pr
 
     private static final String PQ_PICTURE_ADVANCED_DARK_DETAIL = "pq_picture_advanced_dark_detail";
     private static final String PQ_PICTURE_ADVANCED_VRR = "pq_picture_advanced_vrr";
+    private static final String PQ_PICTURE_ADVANCED_QMS = "pq_picture_advanced_qms";
     private static final String PQ_PICTURE_ADVANCED_GAMMA = "pq_picture_advanced_gamma";
     private static final String PQ_PICTURE_ADVANCED_MANUAL_GAMMA = "pq_picture_advanced_manual_gamma";
     private static final String PQ_PICTURE_ADVANCED_COLOR_TEMPERATURE = "pq_picture_advanced_color_temperature";
@@ -73,6 +75,7 @@ public class PQAdvancedFragment extends SettingsPreferenceFragment implements Pr
     private PQSettingsManager mPQSettingsManager;
 
     private Preference pq_brightnessPref;
+    private TwoStatePreference mPictureAdvancedQmsPref;
     private boolean mHasMemc = false;
     private boolean mHasLocalDimming = true;
 
@@ -118,6 +121,7 @@ public class PQAdvancedFragment extends SettingsPreferenceFragment implements Pr
 
         final TwoStatePreference pictureAdvancedDarkDetailPref = (TwoStatePreference) findPreference(PQ_PICTURE_ADVANCED_DARK_DETAIL);
         final TwoStatePreference pictureAdvancedVRRPref = (TwoStatePreference) findPreference(PQ_PICTURE_ADVANCED_VRR);
+        mPictureAdvancedQmsPref = (TwoStatePreference) findPreference(PQ_PICTURE_ADVANCED_QMS);
         final Preference pictureAdvancedGammaPref = (Preference) findPreference(PQ_PICTURE_ADVANCED_GAMMA);
         final Preference pictureAdvancedManualGammaPref = (Preference) findPreference(PQ_PICTURE_ADVANCED_MANUAL_GAMMA);
         final Preference pictureAdvancedColorTemperaturePref = (Preference) findPreference(PQ_PICTURE_ADVANCED_COLOR_TEMPERATURE);
@@ -192,6 +196,9 @@ public class PQAdvancedFragment extends SettingsPreferenceFragment implements Pr
         if (!mPQSettingsManager.STATUS_GAME.equals(pictureMode) || !mPQSettingsManager.isHdmi20Status()) {
             pictureAdvancedVRRPref.setEnabled(false);
         }
+        mPictureAdvancedQmsPref.setOnPreferenceChangeListener(this);
+        mPictureAdvancedQmsPref.setVisible(pictureAdvancedVRRPref.isEnabled() && mPQSettingsManager.getVrr() && mPQSettingsManager.isSupportQMS() );
+        mPictureAdvancedQmsPref.setChecked(mPQSettingsManager.getQMSEnable());
 
         pictureAdvancedGammaPref.setVisible(true);
         pictureAdvancedManualGammaPref.setVisible(true);
@@ -225,7 +232,18 @@ public class PQAdvancedFragment extends SettingsPreferenceFragment implements Pr
             return true;
         }
         if (TextUtils.equals(preference.getKey(), PQ_PICTURE_ADVANCED_VRR)) {
-            mPQSettingsManager.setVrr((boolean) newValue);
+            boolean isEnabledVrr = (boolean) newValue;
+            mPQSettingsManager.setVrr(isEnabledVrr);
+            if (mPQSettingsManager.isSupportQMS()) {
+                mPictureAdvancedQmsPref.setVisible(isEnabledVrr);
+                if (isEnabledVrr && mPQSettingsManager.getQMSEnable()) {
+                    mPQSettingsManager.setQMSEnable(true);
+                }
+            }
+            return true;
+        }
+        if (TextUtils.equals(preference.getKey(), PQ_PICTURE_ADVANCED_QMS)) {
+            mPQSettingsManager.setQMSEnable((boolean) newValue);
             return true;
         }
 
