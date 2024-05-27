@@ -58,6 +58,7 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
 
     private PQSettingsManager mPQSettingsManager;
     private SystemControlManager mSystemControlManager;
+    private AisrDemoLineView mLineView;
 
     public static AiPqFragment newInstance() {
         return new AiPqFragment();
@@ -68,6 +69,7 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
         if (mPQSettingsManager == null) {
             mPQSettingsManager = new PQSettingsManager(getActivity());
         }
+        mLineView = AisrDemoLineView.getInstance(getActivity().getApplicationContext());
         mSystemControlManager = SystemControlManager.getInstance();
         super.onCreate(savedInstanceState);
     }
@@ -144,9 +146,18 @@ public class AiPqFragment extends SettingsPreferenceFragment implements Preferen
         } else if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AI_COLOR)) {
             mPQSettingsManager.setAiColor(((boolean) newValue) == true ? 1 : 0, 1);
         } else if (TextUtils.equals(preference.getKey(), KEY_ENABLE_AISR_DEMO)) {
-            mPQSettingsManager.setAisreDemoEnabled((boolean) newValue);
+            turnOnAiSRDemo((boolean) newValue);
         }
         return true;
+    }
+
+    private void turnOnAiSRDemo(boolean enabled) {
+        mPQSettingsManager.setAisreDemoEnabled(enabled);
+        if (enabled) {
+            mLineView.showLine();
+        } else {
+            mLineView.hideLine();
+        }
     }
 
 }
